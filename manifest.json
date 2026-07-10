@@ -1,0 +1,14 @@
+{
+  "name": "KinéScan",
+  "short_name": "KinéScan",
+  "description": "Goniométrie et bilan morphostatique à partir d'une photo smartphone",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f7f7f4",
+  "theme_color": "#0e7c7b",
+  "lang": "fr",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}

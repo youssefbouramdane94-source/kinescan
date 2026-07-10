@@ -1,0 +1,167 @@
+/* KinéScan — direction visuelle : clinique suisse, papier chaud + accent sarcelle */
+:root {
+  --paper: #f7f7f4;
+  --surface: #ffffff;
+  --ink: #17211f;
+  --ink-soft: #5c6a66;
+  --accent: #0e7c7b;
+  --accent-soft: #e2f0ef;
+  --ok: #1d7a46;
+  --ok-bg: #e7f3ec;
+  --warn: #a05a00;
+  --warn-bg: #fbf0dd;
+  --line: #e3e4df;
+  --radius: 14px;
+  --text-base: clamp(1rem, 0.95rem + 0.3vw, 1.075rem);
+  --space: clamp(0.9rem, 0.7rem + 1vw, 1.4rem);
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: 400 var(--text-base)/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  padding-bottom: 4rem;
+}
+
+/* ---- entête ---- */
+.app-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.8rem var(--space);
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  position: sticky; top: 0; z-index: 10;
+}
+.brand { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; }
+.brand span { color: var(--accent); }
+.pill {
+  font-size: 0.72rem; font-weight: 600;
+  padding: 0.25rem 0.6rem; border-radius: 99px;
+  background: var(--accent-soft); color: var(--accent);
+}
+.pill[data-s="indisponible"] { background: var(--warn-bg); color: var(--warn); }
+
+/* ---- accueil ---- */
+#screen-home { max-width: 620px; margin: 0 auto; padding: var(--space); }
+.lede { color: var(--ink-soft); margin: 0.4rem 0 1.2rem; }
+.mode-card {
+  display: flex; gap: 0.9rem; align-items: center; width: 100%;
+  text-align: left; cursor: pointer;
+  background: var(--surface); color: inherit;
+  border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 1rem 1.1rem; margin-bottom: 0.8rem;
+  font: inherit;
+  transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
+}
+.mode-card:hover, .mode-card:focus-visible {
+  border-color: var(--accent);
+  box-shadow: 0 6px 18px rgba(14, 124, 123, 0.12);
+  transform: translateY(-1px);
+  outline: none;
+}
+.mode-card:active { transform: translateY(0); }
+.mc-emoji { font-size: 1.8rem; }
+.mc-body strong { display: block; font-size: 1.05rem; }
+.mc-body small { color: var(--ink-soft); line-height: 1.35; display: block; margin-top: 0.15rem; }
+.note {
+  font-size: 0.85rem; color: var(--ink-soft);
+  background: var(--surface); border: 1px dashed var(--line);
+  border-radius: var(--radius); padding: 0.8rem 1rem; margin-top: 1rem;
+}
+
+/* ---- espace de travail ---- */
+#screen-work { max-width: 720px; margin: 0 auto; padding: var(--space); }
+.work-head { display: flex; align-items: center; gap: 0.7rem; margin-bottom: 0.6rem; }
+.work-head h1 { font-size: 1.15rem; margin: 0; letter-spacing: -0.01em; }
+
+.bar {
+  display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center;
+  margin-bottom: 0.6rem;
+}
+.bar-label { font-size: 0.85rem; color: var(--ink-soft); }
+.bar .hint { flex-basis: 100%; margin: 0; }
+
+select {
+  font: inherit; font-size: 0.9rem;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--line); border-radius: 10px;
+  background: var(--surface); color: var(--ink);
+  max-width: 100%;
+}
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.seg button {
+  font: inherit; font-size: 0.85rem; font-weight: 600;
+  padding: 0.42rem 0.8rem; border: none; cursor: pointer;
+  background: var(--surface); color: var(--ink-soft);
+}
+.seg button.on { background: var(--accent); color: #fff; }
+
+#cv-wrap { position: relative; min-height: 220px; }
+#cv {
+  display: block; width: 100%;
+  background: #0d1413;
+  border-radius: var(--radius);
+  touch-action: none;
+  cursor: crosshair;
+}
+#empty {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 0.9rem; text-align: center;
+  background: var(--surface); border: 1px dashed var(--line); border-radius: var(--radius);
+  padding: 1.2rem;
+}
+#empty p { margin: 0; color: var(--ink-soft); }
+#empty small { font-size: 0.8rem; }
+
+.actions { display: flex; gap: 0.55rem; margin: 0.8rem 0 0.4rem; flex-wrap: wrap; }
+.btn {
+  font: inherit; font-size: 0.9rem; font-weight: 600;
+  padding: 0.55rem 0.9rem;
+  border: 1px solid var(--line); border-radius: 10px;
+  background: var(--surface); color: var(--ink); cursor: pointer;
+  transition: border-color 120ms ease, background 120ms ease;
+}
+.btn:hover, .btn:focus-visible { border-color: var(--accent); outline: none; }
+.btn:active { background: var(--accent-soft); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn.primary:active { filter: brightness(0.92); }
+.btn.ghost { border: none; background: transparent; font-size: 1.2rem; padding: 0.3rem 0.5rem; }
+
+.hint { font-size: 0.8rem; color: var(--ink-soft); margin: 0.4rem 0; }
+.foot { font-size: 0.75rem; color: var(--ink-soft); margin-top: 1.2rem; border-top: 1px solid var(--line); padding-top: 0.8rem; }
+
+/* ---- métriques ---- */
+#metrics { display: grid; grid-template-columns: 1fr; gap: 0.55rem; margin-top: 0.8rem; }
+@media (min-width: 560px) { #metrics { grid-template-columns: 1fr 1fr; } }
+.metric {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--line);
+  border-radius: 10px;
+  padding: 0.65rem 0.85rem;
+}
+.metric.ok { border-left-color: var(--ok); }
+.metric.warn { border-left-color: var(--warn); background: linear-gradient(0deg, var(--surface), var(--surface)) padding-box; }
+.m-label { font-size: 0.8rem; font-weight: 600; color: var(--ink-soft); }
+.m-value {
+  font-size: 1.45rem; font-weight: 700; letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+  font-family: ui-monospace, "SF Mono", SFMono-Regular, Menlo, monospace;
+}
+.metric.ok .m-value { color: var(--ok); }
+.metric.warn .m-value { color: var(--warn); }
+.m-detail { font-size: 0.82rem; }
+.m-norm { font-size: 0.75rem; color: var(--ink-soft); margin-top: 0.15rem; }
+
+/* ---- toast ---- */
+#toast {
+  position: fixed; left: 50%; bottom: 1.2rem; transform: translateX(-50%);
+  background: var(--ink); color: #fff;
+  font-size: 0.85rem; padding: 0.6rem 1rem; border-radius: 99px;
+  max-width: 90vw; text-align: center; z-index: 50;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}

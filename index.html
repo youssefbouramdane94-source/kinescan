@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0e7c7b">
+<title>KinéScan — goniométrie &amp; bilan morphostatique</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="KinéScan">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="app-head">
+  <div class="brand">Kiné<span>Scan</span></div>
+  <span id="ai-pill" class="pill" data-s="chargement">IA : chargement…</span>
+</header>
+
+<main id="screen-home">
+  <p class="lede">Analyse posturale et mesure des amplitudes articulaires à partir d’une simple photo smartphone.</p>
+
+  <button class="mode-card" data-mode="gonio">
+    <span class="mc-emoji">📐</span>
+    <span class="mc-body">
+      <strong>Goniométrie</strong>
+      <small>Amplitudes articulaires : épaule, coude, hanche, genou, cheville — ou goniomètre libre à 3 points.</small>
+    </span>
+  </button>
+
+  <button class="mode-card" data-mode="face">
+    <span class="mc-emoji">🧍</span>
+    <span class="mc-body">
+      <strong>Morphostatique — vue de face</strong>
+      <small>Fil à plomb, inclinaison tête / épaules / bassin, axe des genoux (valgus–varus).</small>
+    </span>
+  </button>
+
+  <button class="mode-card" data-mode="profil">
+    <span class="mc-emoji">👤</span>
+    <span class="mc-body">
+      <strong>Morphostatique — vue de profil</strong>
+      <small>Fil à plomb depuis la malléole, angle crânio-vertébral, alignement oreille–épaule–hanche–genou.</small>
+    </span>
+  </button>
+
+  <div class="note">
+    ⚠️ Outil pédagogique (PFE kinésithérapie). Les mesures sont réalisées en 2D sur photo :
+    elles sont <strong>indicatives</strong> et ne remplacent ni le goniomètre clinique ni l’examen du praticien.
+  </div>
+</main>
+
+<main id="screen-work" hidden>
+  <div class="work-head">
+    <button id="btn-back" class="btn ghost" aria-label="Retour">←</button>
+    <h1 id="work-title"></h1>
+  </div>
+
+  <div id="bar-gonio" class="bar" hidden>
+    <select id="sel-joint" aria-label="Articulation"></select>
+    <div id="seg-side" class="seg" role="group" aria-label="Côté">
+      <button data-side="D" class="on">Droit</button>
+      <button data-side="G">Gauche</button>
+    </div>
+    <p id="gonio-note" class="hint"></p>
+  </div>
+
+  <div id="bar-profil" class="bar" hidden>
+    <span class="bar-label">Le sujet regarde vers :</span>
+    <div id="seg-facing" class="seg" role="group" aria-label="Orientation">
+      <button data-facing="gauche" class="on">← Gauche</button>
+      <button data-facing="droite">Droite →</button>
+    </div>
+  </div>
+
+  <div id="cv-wrap">
+    <canvas id="cv" hidden></canvas>
+    <div id="empty">
+      <p>Ajoutez une photo du sujet pour commencer.<br>
+      <small>Sujet entier ou segment concerné, appareil bien perpendiculaire au plan à mesurer.</small></p>
+      <button id="btn-photo-empty" class="btn primary">📷 Prendre / choisir une photo</button>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button id="btn-photo" class="btn">📷 Photo</button>
+    <button id="btn-detect" class="btn">✨ Détection auto</button>
+    <button id="btn-export" class="btn">💾 Bilan PNG</button>
+  </div>
+
+  <p class="hint">Faites glisser les points pour les ajuster. <strong>D</strong> = côté droit du sujet
+  (face à la caméra, son côté droit apparaît à gauche de l’image).</p>
+
+  <div id="metrics"></div>
+
+  <p class="foot">Mesures 2D indicatives — sensibles au cadrage, à la distance et à la perpendicularité
+  de la prise de vue. Ne remplace pas l’examen clinique.</p>
+</main>
+
+<input type="file" id="file" accept="image/*" hidden>
+<div id="toast" hidden></div>
+
+<script src="js/angles.js"></script>
+<script src="js/pose.js"></script>
+<script src="js/report.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
