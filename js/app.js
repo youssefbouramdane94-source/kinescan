@@ -226,6 +226,7 @@
     });
 
     // arc + valeur d'angle au sommet (goniométrie)
+    let angleLabel = null;
     if (state.mode === 'gonio') {
       const a = A.angleABC(pts.p0, pts.p1, pts.p2);
       const B = toCv(pts.p1), Av = toCv(pts.p0), Cv = toCv(pts.p2);
@@ -239,7 +240,7 @@
       ctx.lineWidth = 2;
       ctx.arc(B.x, B.y, 26, a1, a2, diff < 0);
       ctx.stroke();
-      drawText(A.r1(a) + '°', B.x + 32, B.y - 12, 16);
+      angleLabel = { text: A.r1(a) + '°', B, dir: bisector(B, Av, Cv) };
     }
 
     // points (le point déplacé devient un anneau pour laisser voir le repère)
@@ -261,8 +262,20 @@
       ctx.fillStyle = '#0e7c7b';
       ctx.arc(c.x, c.y, 5, 0, Math.PI * 2);
       ctx.fill();
-      drawText(pointLabel(id), c.x + 12, c.y - 10, 12);
+      // le nom du sommet passe du côté opposé à la valeur d'angle
+      if (angleLabel && id === 'p1') {
+        const d = angleLabel.dir;
+        drawText(pointLabel(id), c.x - d.x * 30, c.y - d.y * 30 + 4, 12, 'center');
+      } else {
+        drawText(pointLabel(id), c.x + 12, c.y - 10, 12);
+      }
     });
+
+    // valeur d'angle dans l'ouverture de l'angle, par-dessus les étiquettes
+    if (angleLabel) {
+      const { B, dir, text } = angleLabel;
+      drawPill(text, B.x + dir.x * 58, B.y + dir.y * 58, 16);
+    }
 
     if (drag) drawLoupe(drag.id);
   }
@@ -316,13 +329,47 @@
     drawText(pointLabel(id), lx - LOUPE_R + 4, ly + LOUPE_R + 16, 13);
   }
 
-  function drawText(txt, x, y, size) {
+  function drawText(txt, x, y, size, align = 'left') {
+    ctx.save();
     ctx.font = '700 ' + size + 'px system-ui, sans-serif';
+    ctx.textAlign = align;
     ctx.lineWidth = 3;
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
     ctx.strokeText(txt, x, y);
     ctx.fillStyle = '#17211f';
     ctx.fillText(txt, x, y);
+    ctx.restore();
+  }
+
+  // étiquette sur fond sombre, centrée sur (x, y) et gardée dans le canvas
+  function drawPill(txt, x, y, size) {
+    ctx.save();
+    ctx.font = '800 ' + size + 'px system-ui, sans-serif';
+    const w = ctx.measureText(txt).width + 14, h = size + 10;
+    const px = Math.max(2, Math.min(view.w - w - 2, x - w / 2));
+    const py = Math.max(2, Math.min(view.h - h - 2, y - h / 2));
+    ctx.fillStyle = 'rgba(23, 33, 31, 0.88)';
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(px, py, w, h, h / 2); else ctx.rect(px, py, w, h);
+    ctx.fill();
+    ctx.fillStyle = '#ffd644';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(txt, px + w / 2, py + h / 2 + 1);
+    ctx.restore();
+  }
+
+  // direction unitaire de la bissectrice de l'angle A-B-C (perpendiculaire si angle plat)
+  function bisector(B, Av, Cv) {
+    const unit = (P) => {
+      const dx = P.x - B.x, dy = P.y - B.y, L = Math.hypot(dx, dy) || 1;
+      return { x: dx / L, y: dy / L };
+    };
+    const ua = unit(Av), uc = unit(Cv);
+    let x = ua.x + uc.x, y = ua.y + uc.y;
+    const L = Math.hypot(x, y);
+    if (L < 0.2) return { x: -ua.y, y: ua.x };
+    return { x: x / L, y: y / L };
   }
 
   /* ---------- glisser-déposer ----------
