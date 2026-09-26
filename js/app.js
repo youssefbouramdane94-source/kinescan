@@ -242,9 +242,17 @@
       drawText(A.r1(a) + '°', B.x + 32, B.y - 12, 16);
     }
 
-    // points
+    // points (le point déplacé devient un anneau pour laisser voir le repère)
     Object.keys(pts).forEach((id) => {
       const c = toCv(pts[id]);
+      if (drag && id === drag.id) {
+        ctx.beginPath();
+        ctx.strokeStyle = '#ffd644';
+        ctx.lineWidth = 2;
+        ctx.arc(c.x, c.y, 11, 0, Math.PI * 2);
+        ctx.stroke();
+        return;
+      }
       ctx.beginPath();
       ctx.fillStyle = '#ffffff';
       ctx.arc(c.x, c.y, 9, 0, Math.PI * 2);
@@ -255,6 +263,57 @@
       ctx.fill();
       drawText(pointLabel(id), c.x + 12, c.y - 10, 12);
     });
+
+    if (drag) drawLoupe(drag.id);
+  }
+
+  /* ---------- loupe : zone agrandie autour du point déplacé ---------- */
+  const LOUPE_R = 64;      // rayon en px écran
+  const LOUPE_ZOOM = 3.5;  // grossissement par rapport à l'affichage
+  const LOUPE_MARGIN = 10;
+
+  function drawLoupe(id) {
+    const c = toCv(state.pts[id]);
+    const d = 2 * LOUPE_R + 2 * LOUPE_MARGIN;
+    // coin haut-gauche, sauf si le point s'y trouve → coin haut-droit
+    const left = !(c.x < d + 20 && c.y < d + 20);
+    const lx = left ? LOUPE_MARGIN + LOUPE_R : view.w - LOUPE_MARGIN - LOUPE_R;
+    const ly = LOUPE_MARGIN + LOUPE_R;
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(lx, ly, LOUPE_R, 0, Math.PI * 2);
+    ctx.clip();
+    ctx.fillStyle = '#000';
+    ctx.fillRect(lx - LOUPE_R, ly - LOUPE_R, 2 * LOUPE_R, 2 * LOUPE_R);
+    ctx.translate(lx, ly);
+    ctx.scale(LOUPE_ZOOM, LOUPE_ZOOM);
+    ctx.translate(-c.x, -c.y);
+    ctx.drawImage(state.img, view.ox, view.oy, state.img.width * view.scale, state.img.height * view.scale);
+    ctx.restore();
+
+    // réticule avec un vide au centre pour voir le repère exact
+    const gap = 6, arm = 22;
+    ctx.save();
+    ctx.strokeStyle = '#ffd644';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(lx - gap - arm, ly); ctx.lineTo(lx - gap, ly);
+    ctx.moveTo(lx + gap, ly); ctx.lineTo(lx + gap + arm, ly);
+    ctx.moveTo(lx, ly - gap - arm); ctx.lineTo(lx, ly - gap);
+    ctx.moveTo(lx, ly + gap); ctx.lineTo(lx, ly + gap + arm);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(lx, ly, 2, 0, Math.PI * 2);
+    ctx.fillStyle = '#ffd644';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 3;
+    ctx.arc(lx, ly, LOUPE_R, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+    drawText(pointLabel(id), lx - LOUPE_R + 4, ly + LOUPE_R + 16, 13);
   }
 
   function drawText(txt, x, y, size) {
@@ -266,36 +325,47 @@
     ctx.fillText(txt, x, y);
   }
 
-  /* ---------- glisser-déposer ---------- */
-  let drag = null;
+  /* ---------- glisser-déposer ----------
+     Déplacement relatif : le point suit le mouvement du doigt sans sauter
+     dessous, on peut donc le saisir à côté et garder le repère visible. */
+  const HIT_RADIUS = { mouse: 28, touch: 40 };
+  let drag = null; // { id, startFinger, startPoint } en px écran
+
   canvas.addEventListener('pointerdown', (e) => {
     if (!state.img) return;
     const r = canvas.getBoundingClientRect();
     const m = { x: e.clientX - r.left, y: e.clientY - r.top };
-    let best = null, bd = 28;
+    let best = null, bd = e.pointerType === 'mouse' ? HIT_RADIUS.mouse : HIT_RADIUS.touch;
     Object.entries(state.pts).forEach(([id, p]) => {
       const c = toCv(p);
       const d = Math.hypot(c.x - m.x, c.y - m.y);
       if (d < bd) { bd = d; best = id; }
     });
-    if (best) {
-      drag = best;
-      canvas.setPointerCapture(e.pointerId);
-    }
+    if (!best) return;
+    drag = { id: best, startFinger: m, startPoint: toCv(state.pts[best]) };
+    draw();
+    canvas.setPointerCapture(e.pointerId);
   });
 
   canvas.addEventListener('pointermove', (e) => {
     if (!drag) return;
     const r = canvas.getBoundingClientRect();
-    const p = toImg({ x: e.clientX - r.left, y: e.clientY - r.top });
+    const p = toImg({
+      x: drag.startPoint.x + (e.clientX - r.left - drag.startFinger.x),
+      y: drag.startPoint.y + (e.clientY - r.top - drag.startFinger.y),
+    });
     p.x = Math.max(0, Math.min(state.img.width, p.x));
     p.y = Math.max(0, Math.min(state.img.height, p.y));
-    state.pts[drag] = p;
+    state.pts[drag.id] = p;
     draw(); renderMetrics();
   });
 
   ['pointerup', 'pointercancel'].forEach((ev) =>
-    canvas.addEventListener(ev, () => { drag = null; }));
+    canvas.addEventListener(ev, () => {
+      if (!drag) return;
+      drag = null;
+      draw();
+    }));
 
   /* ---------- métriques ---------- */
   function metrics() {
