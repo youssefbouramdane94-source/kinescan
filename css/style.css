@@ -83,6 +83,15 @@ body {
 }
 .bar-label { font-size: 0.85rem; color: var(--ink-soft); }
 .bar .hint { flex-basis: 100%; margin: 0; }
+.check { display: inline-flex; align-items: center; gap: 0.45rem; font-size: 0.9rem; font-weight: 600; color: var(--ink); cursor: pointer; }
+.check input { width: 1.15rem; height: 1.15rem; accent-color: var(--accent); }
+.check small { font-weight: 400; color: var(--ink-soft); }
+.inline-num { font-size: 0.85rem; color: var(--ink-soft); display: inline-flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; }
+.inline-num input {
+  font: inherit; font-size: 0.9rem; width: 5.5rem;
+  padding: 0.4rem 0.5rem; border: 1px solid var(--line); border-radius: 10px;
+  background: var(--surface); color: var(--ink);
+}
 
 select {
   font: inherit; font-size: 0.9rem;

@@ -42,7 +42,7 @@
     <span class="mc-emoji">👤</span>
     <span class="mc-body">
       <strong>Morphostatique — vue de profil</strong>
-      <small>Fil à plomb depuis la malléole, angle crânio-vertébral, alignement oreille–épaule–hanche–genou.</small>
+      <small>Fil à plomb (verticale par la malléole ou fil réel de la photo), angle crânio-vertébral, alignement oreille–épaule–hanche–genou.</small>
     </span>
   </button>
 
@@ -73,6 +73,18 @@
       <button data-facing="gauche" class="on">← Gauche</button>
       <button data-facing="droite">Droite →</button>
     </div>
+  </div>
+
+  <div id="bar-fil" class="bar" hidden>
+    <label class="check">
+      <input type="checkbox" id="chk-fil">
+      Utiliser le fil à plomb de la photo <small>(méthode SAPO)</small>
+    </label>
+    <label id="fil-cm-wrap" class="inline-num" hidden>
+      Écart entre les 2 repères du fil :
+      <input type="number" id="in-fil-cm" inputmode="decimal" min="1" step="0.5" placeholder="ex. 100"> cm
+    </label>
+    <p id="fil-hint" class="hint"></p>
   </div>
 
   <div id="cv-wrap">

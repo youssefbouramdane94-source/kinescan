@@ -12,6 +12,7 @@
     side: 'D',
     facing: 'gauche',  // direction du regard en vue de profil
     lms: null,         // derniers landmarks détectés
+    fil: { on: false, cm: null }, // fil à plomb réel photographié (méthode SAPO)
   };
 
   const canvas = $('#cv');
@@ -27,6 +28,7 @@
   const FACE_LM = { oeilD: 5, oeilG: 2, epauleD: 12, epauleG: 11, hancheD: 24, hancheG: 23, genouD: 26, genouG: 25, chevilleD: 28, chevilleG: 27 };
   const FACE_LABELS = { oeilD: 'Œil D', oeilG: 'Œil G', epauleD: 'Épaule D', epauleG: 'Épaule G', hancheD: 'Hanche D', hancheG: 'Hanche G', genouD: 'Genou D', genouG: 'Genou G', chevilleD: 'Chev. D', chevilleG: 'Chev. G' };
   const PROFIL_LABELS = { oreille: 'Oreille', epaule: 'Épaule', hanche: 'Hanche', genou: 'Genou', malleole: 'Malléole' };
+  const FIL_LABELS = { filH: 'Fil (haut)', filB: 'Fil (bas)' };
 
   const DEFAULTS = {
     face: { oeilD: [0.44, 0.10], oeilG: [0.56, 0.10], epauleD: [0.35, 0.24], epauleG: [0.65, 0.24], hancheD: [0.40, 0.50], hancheG: [0.60, 0.50], genouD: [0.42, 0.70], genouG: [0.58, 0.70], chevilleD: [0.43, 0.90], chevilleG: [0.57, 0.90] },
@@ -48,6 +50,8 @@
     $('#work-title').textContent = MODE_TITLES[state.mode];
     $('#bar-gonio').hidden = state.mode !== 'gonio';
     $('#bar-profil').hidden = state.mode !== 'profil';
+    $('#bar-fil').hidden = state.mode === 'gonio';
+    syncFilUI();
     if (state.img) {
       initPoints();
       layout(); draw(); renderMetrics();
@@ -88,6 +92,30 @@
       Object.entries(DEFAULTS[state.mode]).forEach(([id, [fx, fy]]) => set(id, fx, fy));
     }
     if (state.lms) applyLms();
+    if (state.fil.on && state.mode !== 'gonio') addFilPoints();
+  }
+
+  /* ---------- fil à plomb réel ----------
+     Deux points à poser sur la ficelle photographiée (idéalement sur deux
+     repères dont on connaît l'écart, ex. 100 cm). */
+  function addFilPoints() {
+    const iw = state.img.width, ih = state.img.height, p = state.pts;
+    let x;
+    if (state.mode === 'profil') {
+      // départ juste devant la malléole, comme en clinique (Kendall)
+      x = p.malleole.x + (state.facing === 'gauche' ? -1 : 1) * 0.04 * iw;
+    } else {
+      x = (p.chevilleD.x + p.chevilleG.x) / 2;
+    }
+    x = Math.max(0, Math.min(iw, x));
+    p.filH = { x, y: 0.04 * ih };
+    p.filB = { x, y: 0.97 * ih };
+  }
+
+  function filRef() {
+    const p = state.pts;
+    if (!state.fil.on || state.mode === 'gonio' || !p.filH || !p.filB) return null;
+    return { top: p.filH, bottom: p.filB, cm: state.fil.cm };
   }
 
   function applyLms() {
@@ -154,6 +182,43 @@
     $$('#seg-facing button').forEach((x) => x.classList.toggle('on', x.dataset.facing === state.facing));
   }
 
+  /* ---------- fil à plomb réel : interface ---------- */
+  const FIL_CM_KEY = 'kinescan-fil-cm';
+  function syncFilUI() {
+    const on = state.fil.on;
+    $('#chk-fil').checked = on;
+    $('#fil-cm-wrap').hidden = !on;
+    $('#fil-hint').textContent = on
+      ? (state.fil.cm
+        ? 'Référence v2 : fil réel. Placez « Fil (haut) » et « Fil (bas) » sur les 2 repères du fil. Résultats en cm.'
+        : 'Référence v2 : fil réel. Placez « Fil (haut) » et « Fil (bas) » sur la ficelle. Indiquez l’écart entre les 2 repères pour avoir des cm (sinon %).')
+      : 'Référence v1 : verticale de l’image passant ' + (state.mode === 'face' ? 'entre les deux chevilles' : 'par la malléole') + ' (sans fil sur la photo).';
+  }
+
+  $('#chk-fil').addEventListener('change', (e) => {
+    state.fil.on = e.target.checked;
+    if (state.img) {
+      if (state.fil.on) addFilPoints();
+      else { delete state.pts.filH; delete state.pts.filB; }
+      draw(); renderMetrics();
+    }
+    syncFilUI();
+  });
+
+  $('#in-fil-cm').addEventListener('input', (e) => {
+    const v = parseFloat(String(e.target.value).replace(',', '.'));
+    state.fil.cm = v > 0 ? v : null;
+    try { localStorage.setItem(FIL_CM_KEY, state.fil.cm ? String(state.fil.cm) : ''); } catch (_) { /* stockage indisponible */ }
+    syncFilUI();
+    if (state.img) renderMetrics();
+  });
+
+  try {
+    const saved = parseFloat(localStorage.getItem(FIL_CM_KEY));
+    if (saved > 0) { state.fil.cm = saved; $('#in-fil-cm').value = saved; }
+  } catch (_) { /* stockage indisponible */ }
+  syncFilUI();
+
   /* ---------- canvas ---------- */
   function layout() {
     if (!state.img) return;
@@ -182,6 +247,7 @@
   }
 
   function pointLabel(id) {
+    if (FIL_LABELS[id]) return FIL_LABELS[id];
     if (state.mode === 'gonio') {
       const sp = A.JOINTS[state.joint].points.find((s) => s.id === id);
       return sp ? sp.label : id;
@@ -197,8 +263,10 @@
 
     const pts = state.pts;
 
-    // fil à plomb
-    if (state.mode === 'face' || state.mode === 'profil') {
+    // fil à plomb : fil réel de la photo (v2) ou verticale par la malléole (v1)
+    if (filRef()) {
+      drawRealPlumb(pts);
+    } else if (state.mode === 'face' || state.mode === 'profil') {
       const px = state.mode === 'face'
         ? toCv(A.mid(pts.chevilleD, pts.chevilleG)).x
         : toCv(pts.malleole).x;
@@ -278,6 +346,37 @@
     }
 
     if (drag) drawLoupe(drag.id);
+  }
+
+  // Ligne passant par les deux points du fil + perpendiculaires vers chaque repère mesuré
+  function drawRealPlumb(pts) {
+    const T = toCv(pts.filH), B = toCv(pts.filB);
+    const L = Math.hypot(B.x - T.x, B.y - T.y) || 1;
+    const v = { x: (B.x - T.x) / L, y: (B.y - T.y) / L };
+    const far = view.w + view.h;
+    ctx.save();
+    ctx.strokeStyle = 'rgba(255, 214, 68, 0.95)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(T.x - v.x * far, T.y - v.y * far);
+    ctx.lineTo(T.x + v.x * far, T.y + v.y * far);
+    ctx.stroke();
+
+    const targets = state.mode === 'profil'
+      ? ['oreille', 'epaule', 'hanche', 'genou', 'malleole'].map((id) => pts[id])
+      : [['oeilD', 'oeilG'], ['epauleD', 'epauleG'], ['hancheD', 'hancheG'], ['chevilleD', 'chevilleG']]
+          .map(([a, b]) => A.mid(pts[a], pts[b]));
+    ctx.setLineDash([4, 4]);
+    ctx.lineWidth = 1.5;
+    targets.forEach((pt) => {
+      const P = toCv(pt);
+      const k = (P.x - T.x) * v.x + (P.y - T.y) * v.y;
+      ctx.beginPath();
+      ctx.moveTo(P.x, P.y);
+      ctx.lineTo(T.x + v.x * k, T.y + v.y * k);
+      ctx.stroke();
+    });
+    ctx.restore();
   }
 
   /* ---------- loupe : zone agrandie autour du point déplacé ---------- */
@@ -418,8 +517,8 @@
   function metrics() {
     if (!state.img) return [];
     if (state.mode === 'gonio') return A.gonioMetrics(state.joint, state.side, state.pts);
-    if (state.mode === 'face') return A.faceMetrics(state.pts);
-    return A.profilMetrics(state.pts, state.facing);
+    if (state.mode === 'face') return A.faceMetrics(state.pts, filRef());
+    return A.profilMetrics(state.pts, state.facing, filRef());
   }
 
   function renderMetrics() {
