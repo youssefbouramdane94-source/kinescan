@@ -42,7 +42,7 @@
     <span class="mc-emoji">👤</span>
     <span class="mc-body">
       <strong>Morphostatique — vue de profil</strong>
-      <small>Fil à plomb (verticale par la malléole ou fil réel de la photo), angle crânio-vertébral, alignement oreille–épaule–hanche–genou.</small>
+      <small>Fil à plomb virtuel par la malléole (redressé si la photo penche), angle crânio-vertébral, alignement oreille–épaule–hanche–genou, résultats en cm avec la taille.</small>
     </span>
   </button>
 
@@ -75,23 +75,27 @@
     </div>
   </div>
 
-  <div id="bar-fil" class="bar" hidden>
+  <div id="bar-ref" class="bar" hidden>
     <label class="check">
-      <input type="checkbox" id="chk-fil">
-      Utiliser le fil à plomb de la photo <small>(méthode SAPO)</small>
+      <input type="checkbox" id="chk-vert">
+      Redresser avec une verticale de la photo <small>(fil, porte, angle de mur)</small>
     </label>
-    <label id="fil-cm-wrap" class="inline-num" hidden>
-      Écart entre les 2 repères du fil :
-      <input type="number" id="in-fil-cm" inputmode="decimal" min="1" step="0.5" placeholder="ex. 100"> cm
+    <label class="inline-num">
+      Taille du sujet :
+      <input type="number" id="in-taille" inputmode="decimal" min="50" max="250" step="0.5" placeholder="ex. 179"> cm
     </label>
-    <p id="fil-hint" class="hint"></p>
+    <p id="ref-hint" class="hint"></p>
+    <p class="level-tip">📐 <strong>Avant la photo</strong>, activez le niveau de l’appareil photo :
+      iPhone : Réglages › Appareil photo › Niveau · Android : Appareil photo › Paramètres › Grille / Niveau.
+      Photographiez quand la ligne du niveau est droite.</p>
   </div>
 
   <div id="cv-wrap">
     <canvas id="cv" hidden></canvas>
     <div id="empty">
       <p>Ajoutez une photo du sujet pour commencer.<br>
-      <small>Sujet entier ou segment concerné, appareil bien perpendiculaire au plan à mesurer.</small></p>
+      <small>Sujet entier ou segment concerné, appareil bien perpendiculaire au plan à mesurer.
+      Activez le niveau de l’appareil photo pour que la photo soit droite.</small></p>
       <button id="btn-photo-empty" class="btn primary">📷 Prendre / choisir une photo</button>
     </div>
   </div>

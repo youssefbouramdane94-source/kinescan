@@ -111,38 +111,47 @@ KS.angles = (() => {
     return j.metrics(a, jointKey === 'libre' ? null : side);
   }
 
-  /* ---------- Référence « fil à plomb réel » (méthode SAPO) ----------
-     Deux points posés sur le fil photographié donnent la vraie verticale,
-     même si la photo est penchée ; si la distance réelle entre ces deux
-     repères est connue, ils donnent aussi l'échelle (cm). Sans fil, on garde
-     la référence v1 : verticale de l'image passant par la malléole. */
-  function filFrame(fil) {
-    const L = Math.max(1, dist(fil.top, fil.bottom));
-    const u = { x: (fil.bottom.x - fil.top.x) / L, y: (fil.bottom.y - fil.top.y) / L }; // vers le bas
-    const n = { x: u.y, y: -u.x };                                                      // vers la droite de l'image
+  /* ---------- Référence morphostatique ----------
+     Fil à plomb virtuel passant par la malléole externe (profil) ou entre les
+     chevilles (face). Sa direction est soit la verticale de l'image (v1), soit
+     une vraie verticale repérée sur la photo — fil, bord de porte, angle de
+     mur — qui corrige l'inclinaison du téléphone (v2). L'échelle en cm vient de
+     la taille du sujet rapportée à la distance haut du crâne → sol.
+     ref = { vertical: {top, bottom} | null, height: {top, bottom, cm} | null } */
+  function refFrame(ref, anchor) {
+    const V = ref && ref.vertical;
+    let u = { x: 0, y: 1 }; // vers le bas
+    if (V) {
+      const L = Math.max(1, dist(V.top, V.bottom));
+      u = { x: (V.bottom.x - V.top.x) / L, y: (V.bottom.y - V.top.y) / L };
+      if (u.y < 0) u = { x: -u.x, y: -u.y }; // points posés à l'envers
+    }
+    const n = { x: u.y, y: -u.x }; // vers la droite de l'image
     const dot = (a, b, v) => (b.x - a.x) * v.x + (b.y - a.y) * v.y;
+    const H = ref && ref.height;
+    const hPx = H ? Math.abs(dot(H.top, H.bottom, u)) : 0;
     return {
-      cmPerPx: fil.cm > 0 ? fil.cm / L : null,
-      tilt: deg(Math.atan2(u.x, u.y)),        // 0° = fil vertical sur l'image
-      off: (pt) => dot(fil.top, pt, n),      // distance signée au fil (px), + = droite de l'image
-      down: (a, b) => dot(a, b, u),          // composante verticale vraie de a→b
-      across: (a, b) => dot(a, b, n),        // composante horizontale vraie de a→b
+      tilt: V ? deg(Math.atan2(u.x, u.y)) : null, // 0° = verticale de l'image
+      cmPerPx: H && H.cm > 0 && hPx > 1 ? H.cm / hPx : null,
+      off: (pt) => dot(anchor, pt, n),    // distance signée à la ligne (px), + = droite de l'image
+      down: (a, b) => dot(a, b, u),       // composante verticale de a→b
+      across: (a, b) => dot(a, b, n),     // composante horizontale de a→b
     };
   }
 
-  // Distance au fil : en cm si l'échelle est connue, sinon en % de la hauteur de référence
-  function filDistance(px, F, hPx) {
+  // Distance à la ligne : en cm si l'échelle est connue, sinon en % de la hauteur de référence
+  function lineDistance(px, F, hPx) {
     const pc = r1((px / Math.max(1, hPx)) * 100);
-    const v = F && F.cmPerPx ? r1(px * F.cmPerPx) : pc;
-    return { pc, v, value: Math.abs(v) + (F && F.cmPerPx ? ' cm' : ' %') };
+    const v = F.cmPerPx ? r1(px * F.cmPerPx) : pc;
+    return { pc, value: Math.abs(v) + (F.cmPerPx ? ' cm' : ' %') };
   }
 
   function photoTiltRow(F) {
     const t = r1(Math.abs(F.tilt));
     return {
-      label: 'Inclinaison de la photo (fil / bord de l’image)',
+      label: 'Inclinaison de la photo (verticale repérée / bord de l’image)',
       value: t + '°',
-      detail: t <= 1 ? 'photo droite' : 'photo penchée — corrigée grâce au fil',
+      detail: t <= 1 ? 'photo droite' : 'photo penchée — corrigée',
       status: t <= 1 ? 'ok' : 'warn',
     };
   }
@@ -160,12 +169,12 @@ KS.angles = (() => {
     };
   }
 
-  function faceMetrics(p, fil) {
-    const F = fil ? filFrame(fil) : null;
-    // inclinaison par rapport à la vraie horizontale (perpendiculaire au fil) si fil présent
-    const lineTilt = (a, b) => (F ? deg(Math.atan2(F.down(a, b), F.across(a, b))) : tilt(a, b));
+  function faceMetrics(p, ref) {
+    const feet = mid(p.chevilleD, p.chevilleG), eyes = mid(p.oeilD, p.oeilG);
+    const F = refFrame(ref, feet);
+    const lineTilt = (a, b) => deg(Math.atan2(F.down(a, b), F.across(a, b))); // / horizontale vraie
     const rows = [];
-    if (F) rows.push(photoTiltRow(F));
+    if (F.tilt !== null) rows.push(photoTiltRow(F));
     rows.push(tiltRow('Tête — ligne bipupillaire', lineTilt(p.oeilD, p.oeilG), 3));
     rows.push(tiltRow('Épaules — ligne bi-acromiale', lineTilt(p.epauleD, p.epauleG), 3));
     rows.push(tiltRow('Bassin — ligne bi-iliaque', lineTilt(p.hancheD, p.hancheG), 3));
@@ -180,12 +189,10 @@ KS.angles = (() => {
       detail: axe, norm: 'Ratio écart genoux / écart chevilles', status: st,
     });
 
-    // v1 : verticale de l'image passant entre les deux malléoles ; v2 : fil réel
-    const feet = mid(p.chevilleD, p.chevilleG), eyes = mid(p.oeilD, p.oeilG);
-    const hPx = F ? F.down(eyes, feet) : feet.y - eyes.y;
-    const offPx = (pt) => (F ? F.off(pt) : pt.x - feet.x);
+    // Fil à plomb : ligne passant entre les deux malléoles
+    const hPx = F.down(eyes, feet);
     const off = (pt, name) => {
-      const d = filDistance(offPx(pt), F, hPx);
+      const d = lineDistance(F.off(pt), F, hPx);
       const ok = Math.abs(d.pc) <= 2;
       rows.push({
         label: name + ' / fil à plomb',
@@ -197,18 +204,17 @@ KS.angles = (() => {
     off(eyes, 'Tête');
     off(mid(p.epauleD, p.epauleG), 'Tronc (épaules)');
     off(mid(p.hancheD, p.hancheG), 'Bassin');
-    if (F) off(feet, 'Pieds (milieu des chevilles)');
     return rows;
   }
 
   /* ---------- Morphostatique profil ---------- */
-  function profilMetrics(p, facing, fil) {
-    const F = fil ? filFrame(fil) : null;
+  function profilMetrics(p, facing, ref) {
+    const F = refFrame(ref, p.malleole);
     const rows = [];
-    if (F) rows.push(photoTiltRow(F));
-    // Angle crânio-vertébral approché : ligne acromion → tragus vs horizontale (vraie si fil)
-    const dy = F ? F.down(p.oreille, p.epaule) : p.epaule.y - p.oreille.y;
-    const dx = Math.max(1e-6, Math.abs(F ? F.across(p.epaule, p.oreille) : p.oreille.x - p.epaule.x));
+    if (F.tilt !== null) rows.push(photoTiltRow(F));
+    // Angle crânio-vertébral approché : ligne acromion → tragus vs horizontale
+    const dy = F.down(p.oreille, p.epaule);
+    const dx = Math.max(1e-6, Math.abs(F.across(p.epaule, p.oreille)));
     const cva = r1(deg(Math.atan2(dy, dx)));
     rows.push({
       label: 'Angle crânio-vertébral (approx. tragus–acromion)',
@@ -217,24 +223,20 @@ KS.angles = (() => {
       norm: 'Norme : ≥ 48°', status: cva >= 48 ? 'ok' : 'warn',
     });
 
-    // v1 : verticale de l'image passant par la malléole ; v2 : fil réel (malléole mesurée aussi)
+    // Fil à plomb passant par la malléole externe
     const sign = facing === 'gauche' ? -1 : 1; // regard vers la gauche → l'avant = x plus petit
-    const hPx = F ? F.down(p.oreille, p.malleole) : p.malleole.y - p.oreille.y;
-    const offPx = (pt) => (F ? F.off(pt) : pt.x - p.malleole.x) * sign;
-    const ref = F ? 'fil à plomb' : 'fil à plomb (malléole)';
-    const ids = [['Genou', 'genou'], ['Bassin (grand trochanter)', 'hanche'], ['Épaule (acromion)', 'epaule'], ['Oreille (tragus)', 'oreille']];
-    if (F) ids.unshift(['Malléole externe', 'malleole']);
-    ids.forEach(([nm, id]) => {
-      const d = filDistance(offPx(p[id]), F, hPx);
+    const hPx = F.down(p.oreille, p.malleole);
+    [['Genou', 'genou'], ['Bassin (grand trochanter)', 'hanche'], ['Épaule (acromion)', 'epaule'], ['Oreille (tragus)', 'oreille']].forEach(([nm, id]) => {
+      const d = lineDistance(F.off(p[id]) * sign, F, hPx);
       rows.push({
-        label: nm + ' / ' + ref,
+        label: nm + ' / fil à plomb (malléole)',
         value: d.value,
-        detail: d.pc >= 0 ? (F ? 'en avant du fil' : 'en avant de la ligne') : (F ? 'en arrière du fil' : 'en arrière de la ligne'),
+        detail: d.pc >= 0 ? 'en avant de la ligne' : 'en arrière de la ligne',
         status: Math.abs(d.pc) <= 6 ? 'ok' : 'warn',
       });
     });
     return rows;
   }
 
-  return { angleABC, tilt, dist, mid, r1, JOINTS, gonioMetrics, faceMetrics, profilMetrics, filFrame };
+  return { angleABC, tilt, dist, mid, r1, JOINTS, gonioMetrics, faceMetrics, profilMetrics, refFrame };
 })();

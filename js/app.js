@@ -12,7 +12,7 @@
     side: 'D',
     facing: 'gauche',  // direction du regard en vue de profil
     lms: null,         // derniers landmarks détectés
-    fil: { on: false, cm: null }, // fil à plomb réel photographié (méthode SAPO)
+    ref: { vertical: false, heightCm: null }, // verticale repérée sur la photo + taille du sujet
   };
 
   const canvas = $('#cv');
@@ -28,7 +28,7 @@
   const FACE_LM = { oeilD: 5, oeilG: 2, epauleD: 12, epauleG: 11, hancheD: 24, hancheG: 23, genouD: 26, genouG: 25, chevilleD: 28, chevilleG: 27 };
   const FACE_LABELS = { oeilD: 'Œil D', oeilG: 'Œil G', epauleD: 'Épaule D', epauleG: 'Épaule G', hancheD: 'Hanche D', hancheG: 'Hanche G', genouD: 'Genou D', genouG: 'Genou G', chevilleD: 'Chev. D', chevilleG: 'Chev. G' };
   const PROFIL_LABELS = { oreille: 'Oreille', epaule: 'Épaule', hanche: 'Hanche', genou: 'Genou', malleole: 'Malléole' };
-  const FIL_LABELS = { filH: 'Fil (haut)', filB: 'Fil (bas)' };
+  const REF_LABELS = { vH: 'Verticale (haut)', vB: 'Verticale (bas)', crane: 'Haut du crâne', sol: 'Sol (sous le talon)' };
 
   const DEFAULTS = {
     face: { oeilD: [0.44, 0.10], oeilG: [0.56, 0.10], epauleD: [0.35, 0.24], epauleG: [0.65, 0.24], hancheD: [0.40, 0.50], hancheG: [0.60, 0.50], genouD: [0.42, 0.70], genouG: [0.58, 0.70], chevilleD: [0.43, 0.90], chevilleG: [0.57, 0.90] },
@@ -50,8 +50,8 @@
     $('#work-title').textContent = MODE_TITLES[state.mode];
     $('#bar-gonio').hidden = state.mode !== 'gonio';
     $('#bar-profil').hidden = state.mode !== 'profil';
-    $('#bar-fil').hidden = state.mode === 'gonio';
-    syncFilUI();
+    $('#bar-ref').hidden = state.mode === 'gonio';
+    syncRefUI();
     if (state.img) {
       initPoints();
       layout(); draw(); renderMetrics();
@@ -92,30 +92,47 @@
       Object.entries(DEFAULTS[state.mode]).forEach(([id, [fx, fy]]) => set(id, fx, fy));
     }
     if (state.lms) applyLms();
-    if (state.fil.on && state.mode !== 'gonio') addFilPoints();
-  }
-
-  /* ---------- fil à plomb réel ----------
-     Deux points à poser sur la ficelle photographiée (idéalement sur deux
-     repères dont on connaît l'écart, ex. 100 cm). */
-  function addFilPoints() {
-    const iw = state.img.width, ih = state.img.height, p = state.pts;
-    let x;
-    if (state.mode === 'profil') {
-      // départ juste devant la malléole, comme en clinique (Kendall)
-      x = p.malleole.x + (state.facing === 'gauche' ? -1 : 1) * 0.04 * iw;
-    } else {
-      x = (p.chevilleD.x + p.chevilleG.x) / 2;
+    if (state.mode !== 'gonio') {
+      if (state.ref.vertical) addVerticalPoints();
+      if (state.ref.heightCm) addHeightPoints();
     }
-    x = Math.max(0, Math.min(iw, x));
-    p.filH = { x, y: 0.04 * ih };
-    p.filB = { x, y: 0.97 * ih };
   }
 
-  function filRef() {
+  /* ---------- référence morphostatique ----------
+     Fil à plomb virtuel par la malléole (profil) / entre les chevilles (face).
+     « Verticale » : 2 points posés sur n'importe quoi de vertical dans la photo
+     (fil, bord de porte, angle de mur) pour redresser une photo penchée.
+     « Taille » : haut du crâne + sol → échelle en cm. */
+  const clampX = (x) => Math.max(0, Math.min(state.img.width, x));
+  const clampY = (y) => Math.max(0, Math.min(state.img.height, y));
+  const anchorPoint = () => (state.mode === 'profil'
+    ? state.pts.malleole
+    : A.mid(state.pts.chevilleD, state.pts.chevilleG));
+  const headPoint = () => (state.mode === 'profil'
+    ? state.pts.oreille
+    : A.mid(state.pts.oeilD, state.pts.oeilG));
+
+  function addVerticalPoints() {
+    const x = clampX(anchorPoint().x + 0.08 * state.img.width);
+    state.pts.vH = { x, y: 0.04 * state.img.height };
+    state.pts.vB = { x, y: 0.97 * state.img.height };
+  }
+
+  function addHeightPoints() {
+    const ih = state.img.height, head = headPoint(), foot = anchorPoint();
+    state.pts.crane = { x: head.x, y: clampY(head.y - 0.09 * ih) };
+    // sol décalé vers le talon pour ne pas masquer le point de la malléole
+    const back = state.mode === 'profil' ? (state.facing === 'gauche' ? 1 : -1) * 0.05 * state.img.width : 0;
+    state.pts.sol = { x: clampX(foot.x + back), y: clampY(foot.y + 0.045 * ih) };
+  }
+
+  function refOpts() {
     const p = state.pts;
-    if (!state.fil.on || state.mode === 'gonio' || !p.filH || !p.filB) return null;
-    return { top: p.filH, bottom: p.filB, cm: state.fil.cm };
+    if (state.mode === 'gonio') return null;
+    return {
+      vertical: state.ref.vertical && p.vH && p.vB ? { top: p.vH, bottom: p.vB } : null,
+      height: state.ref.heightCm && p.crane && p.sol ? { top: p.crane, bottom: p.sol, cm: state.ref.heightCm } : null,
+    };
   }
 
   function applyLms() {
@@ -182,42 +199,42 @@
     $$('#seg-facing button').forEach((x) => x.classList.toggle('on', x.dataset.facing === state.facing));
   }
 
-  /* ---------- fil à plomb réel : interface ---------- */
-  const FIL_CM_KEY = 'kinescan-fil-cm';
-  function syncFilUI() {
-    const on = state.fil.on;
-    $('#chk-fil').checked = on;
-    $('#fil-cm-wrap').hidden = !on;
-    $('#fil-hint').textContent = on
-      ? (state.fil.cm
-        ? 'Référence v2 : fil réel. Placez « Fil (haut) » et « Fil (bas) » sur les 2 repères du fil. Résultats en cm.'
-        : 'Référence v2 : fil réel. Placez « Fil (haut) » et « Fil (bas) » sur la ficelle. Indiquez l’écart entre les 2 repères pour avoir des cm (sinon %).')
-      : 'Référence v1 : verticale de l’image passant ' + (state.mode === 'face' ? 'entre les deux chevilles' : 'par la malléole') + ' (sans fil sur la photo).';
+  /* ---------- référence morphostatique : interface ---------- */
+  function syncRefUI() {
+    $('#chk-vert').checked = state.ref.vertical;
+    const where = state.mode === 'face' ? 'entre les chevilles' : 'par la malléole';
+    $('#ref-hint').textContent = (state.ref.vertical
+      ? 'Posez « Verticale (haut) » et « Verticale (bas) » sur quelque chose de vertical (fil, bord de porte, angle de mur) : la photo est redressée. '
+      : 'Fil à plomb virtuel ' + where + ', vertical par rapport à la photo : activez le niveau de l’appareil photo pour qu’elle soit droite. ')
+      + (state.ref.heightCm
+        ? 'Placez « Haut du crâne » et « Sol (sous le talon) » : résultats en cm.'
+        : 'Indiquez la taille du sujet pour avoir des cm (sinon %).');
   }
 
-  $('#chk-fil').addEventListener('change', (e) => {
-    state.fil.on = e.target.checked;
-    if (state.img) {
-      if (state.fil.on) addFilPoints();
-      else { delete state.pts.filH; delete state.pts.filB; }
-      draw(); renderMetrics();
+  function refChanged() {
+    syncRefUI();
+    if (state.img) { draw(); renderMetrics(); }
+  }
+
+  $('#chk-vert').addEventListener('change', (e) => {
+    state.ref.vertical = e.target.checked;
+    if (state.img && state.mode !== 'gonio') {
+      if (state.ref.vertical) addVerticalPoints();
+      else { delete state.pts.vH; delete state.pts.vB; }
     }
-    syncFilUI();
+    refChanged();
   });
 
-  $('#in-fil-cm').addEventListener('input', (e) => {
+  $('#in-taille').addEventListener('input', (e) => {
     const v = parseFloat(String(e.target.value).replace(',', '.'));
-    state.fil.cm = v > 0 ? v : null;
-    try { localStorage.setItem(FIL_CM_KEY, state.fil.cm ? String(state.fil.cm) : ''); } catch (_) { /* stockage indisponible */ }
-    syncFilUI();
-    if (state.img) renderMetrics();
+    state.ref.heightCm = v > 0 ? v : null;
+    if (state.img && state.mode !== 'gonio') {
+      if (state.ref.heightCm && !state.pts.crane) addHeightPoints();
+      if (!state.ref.heightCm) { delete state.pts.crane; delete state.pts.sol; }
+    }
+    refChanged();
   });
-
-  try {
-    const saved = parseFloat(localStorage.getItem(FIL_CM_KEY));
-    if (saved > 0) { state.fil.cm = saved; $('#in-fil-cm').value = saved; }
-  } catch (_) { /* stockage indisponible */ }
-  syncFilUI();
+  syncRefUI();
 
   /* ---------- canvas ---------- */
   function layout() {
@@ -247,7 +264,7 @@
   }
 
   function pointLabel(id) {
-    if (FIL_LABELS[id]) return FIL_LABELS[id];
+    if (REF_LABELS[id]) return REF_LABELS[id];
     if (state.mode === 'gonio') {
       const sp = A.JOINTS[state.joint].points.find((s) => s.id === id);
       return sp ? sp.label : id;
@@ -263,23 +280,7 @@
 
     const pts = state.pts;
 
-    // fil à plomb : fil réel de la photo (v2) ou verticale par la malléole (v1)
-    if (filRef()) {
-      drawRealPlumb(pts);
-    } else if (state.mode === 'face' || state.mode === 'profil') {
-      const px = state.mode === 'face'
-        ? toCv(A.mid(pts.chevilleD, pts.chevilleG)).x
-        : toCv(pts.malleole).x;
-      ctx.save();
-      ctx.setLineDash([7, 6]);
-      ctx.strokeStyle = 'rgba(255, 214, 68, 0.95)';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(px, 0);
-      ctx.lineTo(px, view.h);
-      ctx.stroke();
-      ctx.restore();
-    }
+    if (state.mode === 'face' || state.mode === 'profil') drawPlumb(pts);
 
     // segments
     ctx.lineWidth = 2.5;
@@ -348,32 +349,45 @@
     if (drag) drawLoupe(drag.id);
   }
 
-  // Ligne passant par les deux points du fil + perpendiculaires vers chaque repère mesuré
-  function drawRealPlumb(pts) {
-    const T = toCv(pts.filH), B = toCv(pts.filB);
-    const L = Math.hypot(B.x - T.x, B.y - T.y) || 1;
-    const v = { x: (B.x - T.x) / L, y: (B.y - T.y) / L };
-    const far = view.w + view.h;
+  // Fil à plomb virtuel (pointillés jaunes) par la malléole / entre les chevilles,
+  // parallèle à la verticale repérée si elle existe (trait bleu fin), avec les
+  // perpendiculaires vers chaque repère mesuré.
+  function drawPlumb(pts) {
+    const O = toCv(anchorPoint());
+    let v = { x: 0, y: 1 };
     ctx.save();
+    if (pts.vH && pts.vB) {
+      const T = toCv(pts.vH), B = toCv(pts.vB);
+      const L = Math.hypot(B.x - T.x, B.y - T.y) || 1;
+      v = { x: (B.x - T.x) / L, y: (B.y - T.y) / L };
+      if (v.y < 0) v = { x: -v.x, y: -v.y };
+      ctx.strokeStyle = 'rgba(80, 200, 255, 0.9)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(T.x, T.y);
+      ctx.lineTo(B.x, B.y);
+      ctx.stroke();
+    }
+    const far = view.w + view.h;
+    ctx.setLineDash([7, 6]);
     ctx.strokeStyle = 'rgba(255, 214, 68, 0.95)';
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(T.x - v.x * far, T.y - v.y * far);
-    ctx.lineTo(T.x + v.x * far, T.y + v.y * far);
+    ctx.moveTo(O.x - v.x * far, O.y - v.y * far);
+    ctx.lineTo(O.x + v.x * far, O.y + v.y * far);
     ctx.stroke();
 
     const targets = state.mode === 'profil'
-      ? ['oreille', 'epaule', 'hanche', 'genou', 'malleole'].map((id) => pts[id])
-      : [['oeilD', 'oeilG'], ['epauleD', 'epauleG'], ['hancheD', 'hancheG'], ['chevilleD', 'chevilleG']]
-          .map(([a, b]) => A.mid(pts[a], pts[b]));
-    ctx.setLineDash([4, 4]);
-    ctx.lineWidth = 1.5;
+      ? ['oreille', 'epaule', 'hanche', 'genou'].map((id) => pts[id])
+      : [['oeilD', 'oeilG'], ['epauleD', 'epauleG'], ['hancheD', 'hancheG']].map(([a, b]) => A.mid(pts[a], pts[b]));
+    ctx.setLineDash([3, 4]);
+    ctx.lineWidth = 1.2;
     targets.forEach((pt) => {
       const P = toCv(pt);
-      const k = (P.x - T.x) * v.x + (P.y - T.y) * v.y;
+      const k = (P.x - O.x) * v.x + (P.y - O.y) * v.y;
       ctx.beginPath();
       ctx.moveTo(P.x, P.y);
-      ctx.lineTo(T.x + v.x * k, T.y + v.y * k);
+      ctx.lineTo(O.x + v.x * k, O.y + v.y * k);
       ctx.stroke();
     });
     ctx.restore();
@@ -517,8 +531,8 @@
   function metrics() {
     if (!state.img) return [];
     if (state.mode === 'gonio') return A.gonioMetrics(state.joint, state.side, state.pts);
-    if (state.mode === 'face') return A.faceMetrics(state.pts, filRef());
-    return A.profilMetrics(state.pts, state.facing, filRef());
+    if (state.mode === 'face') return A.faceMetrics(state.pts, refOpts());
+    return A.profilMetrics(state.pts, state.facing, refOpts());
   }
 
   function renderMetrics() {

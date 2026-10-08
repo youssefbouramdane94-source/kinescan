@@ -86,6 +86,11 @@ body {
 .check { display: inline-flex; align-items: center; gap: 0.45rem; font-size: 0.9rem; font-weight: 600; color: var(--ink); cursor: pointer; }
 .check input { width: 1.15rem; height: 1.15rem; accent-color: var(--accent); }
 .check small { font-weight: 400; color: var(--ink-soft); }
+.level-tip {
+  flex-basis: 100%; margin: 0; padding: 0.55rem 0.7rem;
+  font-size: 0.8rem; line-height: 1.45; color: var(--ink-soft);
+  background: var(--surface); border: 1px dashed var(--line); border-radius: 10px;
+}
 .inline-num { font-size: 0.85rem; color: var(--ink-soft); display: inline-flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; }
 .inline-num input {
   font: inherit; font-size: 0.9rem; width: 5.5rem;
