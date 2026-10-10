@@ -87,7 +87,7 @@
     state.pts = {};
     const set = (id, fx, fy) => { state.pts[id] = { x: fx * iw, y: fy * ih }; };
     if (state.mode === 'gonio') {
-      A.JOINTS[state.joint].points.forEach((sp, i) => set(sp.id, 0.32 + 0.16 * i, 0.25 + 0.24 * i));
+      A.JOINTS[state.joint].points.forEach((sp, i) => set(sp.id, ...(sp.def || [0.32 + 0.16 * i, 0.25 + 0.24 * i])));
     } else {
       Object.entries(DEFAULTS[state.mode]).forEach(([id, [fx, fy]]) => set(id, fx, fy));
     }
@@ -256,7 +256,9 @@
   const toImg = (p) => ({ x: (p.x - view.ox) / view.scale, y: (p.y - view.oy) / view.scale });
 
   function segmentsForMode() {
-    if (state.mode === 'gonio') return [['p0', 'p1', 'p2']];
+    if (state.mode === 'gonio') {
+      return A.JOINTS[state.joint].parallel ? [['p0', 'p1'], ['p2', 'p3']] : [['p0', 'p1', 'p2']];
+    }
     if (state.mode === 'face') {
       return [['oeilD', 'oeilG'], ['epauleD', 'epauleG'], ['hancheD', 'hancheG'], ['genouD', 'genouG'], ['chevilleD', 'chevilleG']];
     }
@@ -297,8 +299,21 @@
     // arc + valeur d'angle au sommet (goniométrie)
     let angleLabel = null;
     if (state.mode === 'gonio') {
-      const a = A.angleABC(pts.p0, pts.p1, pts.p2);
-      const B = toCv(pts.p1), Av = toCv(pts.p0), Cv = toCv(pts.p2);
+      const [P0, P1, P2] = A.gonioTriplet(state.joint, pts);
+      const a = A.angleABC(P0, P1, P2);
+      const B = toCv(P1), Av = toCv(P0), Cv = toCv(P2);
+      if (A.JOINTS[state.joint].parallel) {
+        // branche mobile virtuelle (pointillés) parallèle au 5e métatarsien
+        ctx.save();
+        ctx.setLineDash([6, 5]);
+        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = 'rgba(255, 214, 68, 0.95)';
+        ctx.beginPath();
+        ctx.moveTo(B.x, B.y);
+        ctx.lineTo(Cv.x, Cv.y);
+        ctx.stroke();
+        ctx.restore();
+      }
       const a1 = Math.atan2(Av.y - B.y, Av.x - B.x);
       const a2 = Math.atan2(Cv.y - B.y, Cv.x - B.x);
       let diff = a2 - a1;

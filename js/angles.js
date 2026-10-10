@@ -74,11 +74,14 @@ KS.angles = (() => {
     },
     cheville: {
       label: 'Cheville — flexion dorsale / plantaire',
-      note: 'Photo de profil du pied. Repères : tête de la fibula → malléole externe → 5e métatarsien.',
+      note: 'Photo de profil du pied. Tête de la fibula → malléole externe, puis 2 points sur le 5e métatarsien (base / styloïde et tête) : la ligne du pied passe par la malléole, parallèle au 5e métatarsien (méthode Norkin & White).',
+      // branche mobile virtuelle : passe par la malléole, parallèle à base → tête du 5e métatarsien
+      parallel: true,
       points: [
-        { id: 'p0', label: 'Genou', lm: { D: 26, G: 25 } },
-        { id: 'p1', label: 'Malléole', lm: { D: 28, G: 27 } },
-        { id: 'p2', label: 'Avant-pied', lm: { D: 32, G: 31 } },
+        { id: 'p0', label: 'Tête fibula', lm: { D: 26, G: 25 }, def: [0.45, 0.15] },
+        { id: 'p1', label: 'Malléole', lm: { D: 28, G: 27 }, def: [0.45, 0.62] },
+        { id: 'p2', label: 'Base 5e méta', lm: { D: 30, G: 29 }, def: [0.42, 0.76] },
+        { id: 'p3', label: 'Tête 5e méta', lm: { D: 32, G: 31 }, def: [0.75, 0.76] },
       ],
       metrics(a, side) {
         const pos = r1(90 - a);
@@ -105,9 +108,16 @@ KS.angles = (() => {
     },
   };
 
+  // Les 3 points qui définissent l'angle mesuré : pour une articulation « parallel »,
+  // la 2e branche part du sommet parallèlement à la ligne p2 → p3.
+  function gonioTriplet(jointKey, p) {
+    if (!JOINTS[jointKey].parallel) return [p.p0, p.p1, p.p2];
+    return [p.p0, p.p1, { x: p.p1.x + (p.p3.x - p.p2.x), y: p.p1.y + (p.p3.y - p.p2.y) }];
+  }
+
   function gonioMetrics(jointKey, side, p) {
     const j = JOINTS[jointKey];
-    const a = angleABC(p.p0, p.p1, p.p2);
+    const a = angleABC(...gonioTriplet(jointKey, p));
     return j.metrics(a, jointKey === 'libre' ? null : side);
   }
 
@@ -238,5 +248,5 @@ KS.angles = (() => {
     return rows;
   }
 
-  return { angleABC, tilt, dist, mid, r1, JOINTS, gonioMetrics, faceMetrics, profilMetrics, refFrame };
+  return { angleABC, tilt, dist, mid, r1, JOINTS, gonioMetrics, gonioTriplet, faceMetrics, profilMetrics, refFrame };
 })();
