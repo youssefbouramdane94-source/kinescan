@@ -283,8 +283,8 @@
     if (state.mode === 'face' || state.mode === 'profil') drawPlumb(pts);
 
     // segments
-    ctx.lineWidth = 2.5;
-    ctx.strokeStyle = 'rgba(20, 205, 200, 0.95)';
+    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = 'rgba(20, 205, 200, 0.8)';
     segmentsForMode().forEach((chain) => {
       ctx.beginPath();
       chain.forEach((id, i) => {
@@ -312,31 +312,19 @@
       angleLabel = { text: A.r1(a) + '°', B, dir: bisector(B, Av, Cv) };
     }
 
-    // points (le point déplacé devient un anneau pour laisser voir le repère)
+    // points : petits anneaux transparents pour laisser voir le repère dessous
+    // (la zone de prise au doigt reste grande, voir HIT_RADIUS)
     Object.keys(pts).forEach((id) => {
       const c = toCv(pts[id]);
-      if (drag && id === drag.id) {
-        ctx.beginPath();
-        ctx.strokeStyle = '#ffd644';
-        ctx.lineWidth = 2;
-        ctx.arc(c.x, c.y, 11, 0, Math.PI * 2);
-        ctx.stroke();
-        return;
-      }
-      ctx.beginPath();
-      ctx.fillStyle = '#ffffff';
-      ctx.arc(c.x, c.y, 9, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.fillStyle = '#0e7c7b';
-      ctx.arc(c.x, c.y, 5, 0, Math.PI * 2);
-      ctx.fill();
+      const dragging = drag && id === drag.id;
+      drawRing(c, dragging ? '#ffd644' : pointColor(id), dragging ? 9 : POINT_R);
+      if (dragging) return;
       // le nom du sommet passe du côté opposé à la valeur d'angle
       if (angleLabel && id === 'p1') {
         const d = angleLabel.dir;
-        drawText(pointLabel(id), c.x - d.x * 30, c.y - d.y * 30 + 4, 12, 'center');
+        drawText(pointLabel(id), c.x - d.x * 30, c.y - d.y * 30 + 4, 11, 'center');
       } else {
-        drawText(pointLabel(id), c.x + 12, c.y - 10, 12);
+        drawText(pointLabel(id), c.x + 9, c.y - 7, 11);
       }
     });
 
@@ -440,6 +428,28 @@
     ctx.stroke();
     ctx.restore();
     drawText(pointLabel(id), lx - LOUPE_R + 4, ly + LOUPE_R + 16, 13);
+  }
+
+  const POINT_R = 6;
+  const pointColor = (id) => (id === 'vH' || id === 'vB' ? '#50c8ff'
+    : id === 'crane' || id === 'sol' ? '#5cff7a' : '#14e0d6');
+
+  // anneau coloré cerné de sombre (lisible sur fond clair ou foncé) + point central fin
+  function drawRing(c, color, r) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(c.x, c.y, r, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.65)';
+    ctx.lineWidth = 4;
+    ctx.stroke();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(c.x, c.y, 1.4, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.restore();
   }
 
   function drawText(txt, x, y, size, align = 'left') {
