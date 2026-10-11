@@ -3,3 +3,4 @@ qr-*.png
 .claude/*
 !.claude/skills/
 .vercel
+mnt/
