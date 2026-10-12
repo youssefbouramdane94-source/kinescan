@@ -4,13 +4,13 @@
 
 Pour qui : étudiants et professionnels de la kinésithérapie.
 Statut : version test ; mesures 2D indicatives, sensibles au cadrage et à la perpendicularité de la prise de vue. KinéScan n'est pas un dispositif médical et ne remplace ni le goniomètre clinique ni l'examen d'un professionnel de santé.
-Fonctionnement : on prend ou choisit une photo de profil, les repères anatomiques sont proposés automatiquement (modèle MediaPipe exécuté sur l'appareil) puis ajustés au doigt avec une loupe, l'angle s'affiche avec la norme AAOS, et le bilan peut être exporté en image PNG.
-Accès : gratuit, sans inscription, sans cookie, sans mesure d'audience ; fonctionne sur iPhone, Android et ordinateur.
+Fonctionnement : on prend ou choisit une photo de profil, les repères anatomiques sont proposés automatiquement (modèle MediaPipe exécuté sur l'appareil) puis ajustés au doigt avec une loupe, l'angle s'affiche avec la norme AAOS, puis peut être enregistré dans le dossier du patient (diagnostics, courbe d'évolution) ou exporté en image PNG. Les dossiers patients sont stockés uniquement sur l'appareil.
+Accès : gratuit, sans inscription, sans cookie, sans mesure d'audience ; fonctionne sur iPhone, Android et ordinateur, s'installe sur l'écran d'accueil et marche hors ligne.
 
 ## Pages principales
 
 - [Outil KinéScan](https://kinescan.vercel.app/): accueil et outil de goniométrie
-- [Politique de confidentialité](https://kinescan.vercel.app/confidentialite.html): aucune collecte de données, photos traitées localement, avis envoyés volontairement par WhatsApp ou email
+- [Politique de confidentialité](https://kinescan.vercel.app/confidentialite.html): aucune collecte de données, photos et dossiers patients stockés localement, avis envoyés volontairement par WhatsApp ou email
 - [Conditions d'utilisation](https://kinescan.vercel.app/cgu.html): usage pédagogique, version test, limites des mesures, photos de personnes
 - [Mentions légales](https://kinescan.vercel.app/mentions-legales.html): éditeur, hébergeur, composants tiers et licences
 

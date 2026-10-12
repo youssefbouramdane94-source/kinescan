@@ -16,24 +16,57 @@
   const ctx = canvas.getContext('2d');
   const view = { scale: 1, ox: 0, oy: 0, w: 0, h: 0, dpr: 1 };
 
-  /* ---------- navigation ---------- */
-  function showHome() {
-    $('#screen-work').hidden = true;
-    $('#screen-home').hidden = false;
+  /* ---------- navigation (adresses #/… : le bouton retour du téléphone fonctionne) ---------- */
+  const SCREENS = ['home', 'work', 'patients', 'patient'];
+
+  function showScreen(name) {
+    const el = $('#screen-' + name);
+    if (!el.hidden) return false;
+    SCREENS.forEach((s) => { $('#screen-' + s).hidden = s !== name; });
     window.scrollTo({ top: 0 });
+    return true;
   }
 
+  function route() {
+    const h = location.hash;
+    if (h === '#/mesure') {
+      showScreen('work');
+      if (state.img) { layout(); draw(); renderMetrics(); }
+      KS.patients.renderCtx();
+      $('#work-title').focus({ preventScroll: true });
+    } else if (h === '#/patients') {
+      showScreen('patients');
+      KS.patients.renderList();
+    } else if (h.startsWith('#/patient/')) {
+      showScreen('patient');
+      KS.patients.renderDetail(decodeURIComponent(h.slice(10)));
+    } else if (showScreen('home') && h && !h.startsWith('#/')) {
+      const target = document.getElementById(h.slice(1)); // ancre de l'accueil (#how…)
+      if (target) target.scrollIntoView();
+    }
+  }
+
+  // '' = accueil ; si l'adresse ne change pas, on réaffiche quand même l'écran
+  function go(h) {
+    if (!h) { history.pushState(null, '', location.pathname + location.search); route(); return; }
+    if (location.hash === h) route(); else location.hash = h;
+  }
+  KS.go = go;
+  window.addEventListener('hashchange', route);
+
   function enterWorkspace(joint) {
-    if (joint && A.JOINTS[joint]) selectJoint(joint);
-    $('#screen-home').hidden = true;
-    $('#screen-work').hidden = false;
-    window.scrollTo({ top: 0 });
-    if (state.img) { layout(); initPoints(); draw(); renderMetrics(); }
-    $('#work-title').focus({ preventScroll: true });
+    if (joint && A.JOINTS[joint]) {
+      selectJoint(joint);
+      if (state.img) initPoints();
+    }
+    go('#/mesure');
   }
 
   $$('[data-joint]').forEach((b) => b.addEventListener('click', () => enterWorkspace(b.dataset.joint)));
-  $('#btn-back').addEventListener('click', showHome);
+  $('#btn-back').addEventListener('click', () => {
+    const p = KS.patients.active;
+    go(p ? '#/patient/' + encodeURIComponent(p.id) : '');
+  });
 
   /* ---------- photo ---------- */
   const openFile = () => $('#file').click();
@@ -198,7 +231,7 @@
     });
 
     // valeur d'angle dans l'ouverture de l'angle, par-dessus les étiquettes
-    drawPill(A.r1(a) + '°', B.x + dir.x * 58, B.y + dir.y * 58, 16);
+    drawPill(A.degFr(a), B.x + dir.x * 58, B.y + dir.y * 58, 16);
 
     if (drag) drawLoupe(drag.id);
   }
@@ -397,6 +430,27 @@
     KS.report.save(canvas, metrics(), 'Goniométrie — ' + A.JOINTS[state.joint].label);
   });
 
+  /* ---------- lien avec les dossiers patients ---------- */
+  KS.work = {
+    enter: () => enterWorkspace(null),
+    reset() {
+      state.img = null; state.lms = null; state.pts = {};
+      canvas.hidden = true;
+      $('#empty').hidden = false;
+      $('#metrics').innerHTML = '';
+    },
+    snapshot() {
+      if (!state.img) return null;
+      return {
+        joint: state.joint,
+        jointLabel: A.JOINTS[state.joint].label,
+        side: state.joint === 'libre' ? '' : state.side,
+        items: metrics().map((m) => ({ label: m.label, value: String(m.value), norm: m.norm || '' })),
+        canvas,
+      };
+    },
+  };
+
   /* ---------- divers ---------- */
   let toastTimer = null;
   function toast(msg) {
@@ -433,4 +487,7 @@
   });
   P.init();
   KS.feedback.init();
+  KS.patients.init();
+  KS.install.init();
+  route();
 })();

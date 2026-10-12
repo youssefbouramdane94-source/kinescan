@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#f6f5f1">
 <title>Politique de confidentialité — KinéScan</title>
-<meta name="description" content="KinéScan ne collecte aucune donnée : les photos sont analysées dans votre navigateur et ne sont jamais envoyées. Aucun cookie, aucune mesure d’audience.">
+<meta name="description" content="KinéScan ne collecte aucune donnée : les photos sont analysées sur votre appareil et les dossiers patients y restent stockés. Rien n’est envoyé. Aucun cookie, aucune mesure d’audience.">
 <link rel="canonical" href="https://kinescan.vercel.app/confidentialite.html">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -23,7 +23,8 @@
 
   <div class="summary">
     <p><strong>En bref :</strong> KinéScan ne collecte aucune donnée. Vos photos sont analysées directement dans votre
-    navigateur et ne sont jamais envoyées, ni à l’éditeur ni à un tiers. Pas de compte, pas de cookie, pas de mesure d’audience.
+    navigateur et ne sont jamais envoyées, ni à l’éditeur ni à un tiers. Les dossiers patients que vous créez restent
+    uniquement sur votre appareil : l’éditeur n’y a pas accès. Pas de compte, pas de cookie, pas de mesure d’audience.
     Seul l’hébergeur voit passer les informations techniques nécessaires à l’affichage du site (adresse IP, navigateur).
     Si vous choisissez de donner votre avis, c’est vous qui l’envoyez depuis votre WhatsApp ou votre messagerie.</p>
   </div>
@@ -39,13 +40,42 @@
     <li><strong>Vos photos.</strong> Elles sont ouvertes et analysées dans votre navigateur. La détection automatique des points
     utilise un modèle d’intelligence artificielle téléchargé depuis le serveur de KinéScan puis exécuté sur votre appareil :
     la photo ne part nulle part. Quand vous fermez la page, elle disparaît de la mémoire.</li>
-    <li><strong>Les points et les mesures.</strong> Ils sont calculés sur votre appareil et ne sont enregistrés
-    nulle part, pas même dans votre navigateur.</li>
+    <li><strong>Les points et les mesures.</strong> Ils sont calculés sur votre appareil. Ils ne sont enregistrés que si
+    vous les ajoutez à un dossier patient, et seulement sur votre appareil (voir ci-dessous).</li>
     <li><strong>Le bilan PNG.</strong> Il est créé sur votre appareil et enregistré à l’endroit que vous choisissez.
     Il contient la photo du sujet : vous en êtes le seul détenteur et le seul responsable.</li>
     <li><strong>Aucun compte, newsletter ou paiement.</strong> Le volet « Donner mon avis » n’envoie rien lui-même :
     il prépare un message que vous relisez puis envoyez vous-même (voir ci-dessous).</li>
   </ul>
+
+  <h2 id="dossiers">Dossiers patients : stockés uniquement sur votre appareil</h2>
+  <p>Si vous créez des dossiers patients, KinéScan les enregistre dans la base de données de votre navigateur
+  (IndexedDB) ou de l’application installée, <strong>sur votre téléphone ou votre ordinateur uniquement</strong>.
+  Il n’existe ni serveur, ni compte, ni synchronisation : l’éditeur ne reçoit et ne voit aucun de ces dossiers.</p>
+  <ul>
+    <li><strong>Contenu d’un dossier :</strong> nom ou initiales, âge, sport ou activité, diagnostic médical, diagnostic
+    kinésithérapique et notes (tous facultatifs sauf le nom), puis pour chaque mesure : la date, l’articulation, le côté,
+    les angles calculés et une miniature de la photo annotée.</li>
+    <li><strong>Vous êtes responsable de ces données.</strong> En utilisant les dossiers pour vos patients, vous êtes le
+    responsable du traitement au sens de la loi 09-08. Ce sont des données de santé, donc sensibles : informez vos
+    patients, recueillez leur consentement et accomplissez les formalités auprès de la CNDP qui vous concernent (la CNDP a
+    publié un modèle de demande d’autorisation pour les traitements de suivi des patients, délibération n° D-941-2025 du
+    28 novembre 2025).</li>
+    <li><strong>Limitez les données :</strong> des initiales ou un pseudonyme suffisent ; protégez votre téléphone par un
+    code de verrouillage.</li>
+    <li><strong>Durée :</strong> les dossiers restent tant que vous ne les supprimez pas. Supprimer un dossier dans l’appli
+    efface aussi ses mesures et ses photos. Effacer les données du site dans votre navigateur ou désinstaller l’application
+    efface tous les dossiers, sans retour possible.</li>
+    <li><strong>Sauvegarde :</strong> le bouton « Sauvegarder dans un fichier » crée un fichier sur votre appareil, à
+    l’endroit que vous choisissez. Il contient des données de santé : rangez-le en lieu sûr, ne l’envoyez pas par une
+    messagerie non sécurisée. KinéScan ne l’envoie nulle part.</li>
+    <li>Pour éviter que le navigateur efface les dossiers quand l’espace manque, KinéScan lui demande de les conserver
+    durablement (stockage persistant). Sur iPhone, installez l’application sur l’écran d’accueil pour qu’ils soient conservés.</li>
+  </ul>
+
+  <h2>Utilisation hors ligne</h2>
+  <p>Pour fonctionner sans internet, KinéScan garde une copie de ses propres fichiers (pages, styles, scripts, polices,
+  moteur de détection) dans le cache de votre navigateur. Ce cache ne contient aucune donnée personnelle et rien n’est envoyé.</p>
 
   <h2>Si vous donnez votre avis</h2>
   <p>Le volet « Donner mon avis » compose, sur votre appareil, un message contenant votre note, les cases cochées et votre
@@ -93,15 +123,17 @@
   WhatsApp ou votre messagerie, et uniquement si vous les utilisez.</p>
 
   <h2>Cookies et traceurs</h2>
-  <p>KinéScan ne dépose <strong>aucun cookie</strong> et n’utilise aucun stockage dans votre navigateur (ni localStorage, ni IndexedDB),
-  aucune mesure d’audience et aucun traceur. C’est pourquoi aucun bandeau de consentement ne s’affiche. Si cela devait changer,
-  cette page serait mise à jour et votre accord serait demandé avant tout dépôt d’un traceur non indispensable.</p>
+  <p>KinéScan ne dépose <strong>aucun cookie</strong> et n’utilise aucune mesure d’audience ni aucun traceur. Il utilise seulement
+  deux stockages de votre navigateur, indispensables aux fonctions que vous demandez et jamais lus par l’éditeur :
+  la base IndexedDB pour vos dossiers patients (uniquement si vous en créez) et le cache de l’application pour l’utilisation
+  hors ligne. C’est pourquoi aucun bandeau de consentement ne s’affiche. Si cela devait changer, cette page serait mise à jour
+  et votre accord serait demandé avant tout dépôt d’un traceur non indispensable.</p>
 
   <h2>Si vous photographiez une autre personne</h2>
   <p>Lorsque vous analysez la photo d’un patient ou d’un proche, c’est vous qui traitez son image et, le cas échéant,
   des informations sur sa santé. Recueillez son consentement (celui d’un titulaire de l’autorité parentale pour un mineur),
   expliquez-lui l’usage de la photo et conservez ou partagez le bilan PNG dans le respect du secret professionnel.
-  KinéScan ne reçoit aucune de ces images.</p>
+  KinéScan ne reçoit aucune de ces images, ni les dossiers où vous les enregistrez.</p>
 
   <h2>Vos droits</h2>
   <p>Selon la loi 09-08, vous disposez d’un droit d’information, d’accès, de rectification et d’opposition. Si vous êtes situé
@@ -120,7 +152,7 @@
 </main>
 
 <footer class="site-foot">
-  <p class="privacy-line">Vos photos restent sur votre appareil : rien n’est envoyé ni enregistré.</p>
+  <p class="privacy-line">Vos photos et vos dossiers patients restent sur votre appareil : rien n’est envoyé.</p>
   <nav aria-label="Informations légales">
     <a href="mentions-legales.html">Mentions légales</a>
     <a href="confidentialite.html" aria-current="page">Confidentialité</a>

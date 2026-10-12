@@ -1,14 +1,24 @@
 {
+  "id": "./",
   "name": "KinéScan",
   "short_name": "KinéScan",
-  "description": "Goniométrie 2D à partir d'une photo smartphone (version test)",
-  "start_url": ".",
+  "description": "Goniométrie 2D sur photo smartphone et suivi des patients, données stockées sur l'appareil (version test)",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#f6f5f1",
   "theme_color": "#f6f5f1",
   "lang": "fr",
+  "categories": ["medical", "health", "education"],
   "icons": [
-    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
-    { "src": "apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "shortcuts": [
+    { "name": "Mes patients", "url": "./#/patients", "icons": [{ "src": "icon-192.png", "sizes": "192x192" }] },
+    { "name": "Nouvelle mesure", "url": "./#/mesure", "icons": [{ "src": "icon-192.png", "sizes": "192x192" }] }
   ]
 }

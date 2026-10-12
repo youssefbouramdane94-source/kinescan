@@ -3,6 +3,8 @@ window.KS = window.KS || {};
 KS.angles = (() => {
   const deg = (r) => (r * 180) / Math.PI;
   const r1 = (v) => Math.round(v * 10) / 10;
+  // affichage français : 49,7°
+  const degFr = (v) => r1(v).toLocaleString('fr-FR', { maximumFractionDigits: 1 }) + '°';
   const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
   const mid = (a, b) => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
 
@@ -33,7 +35,7 @@ KS.angles = (() => {
         { id: 'p2', label: 'Poignet', lm: { D: 16, G: 15 } },
       ],
       metrics(a, side) {
-        return [{ label: 'Flexion du coude' + sideTxt(side), value: r1(180 - a) + '°', norm: 'Norme AAOS : flexion 0–150°, extension 0°' }];
+        return [{ label: 'Flexion du coude' + sideTxt(side), value: degFr(180 - a), norm: 'Norme AAOS : flexion 0–150°, extension 0°' }];
       },
     },
     epaule: {
@@ -45,7 +47,7 @@ KS.angles = (() => {
         { id: 'p2', label: 'Coude', lm: { D: 14, G: 13 } },
       ],
       metrics(a, side) {
-        return [{ label: 'Élévation de l’épaule' + sideTxt(side), value: r1(a) + '°', norm: 'Norme AAOS : flexion 0–180° · abduction 0–180°' }];
+        return [{ label: 'Élévation de l’épaule' + sideTxt(side), value: degFr(a), norm: 'Norme AAOS : flexion 0–180° · abduction 0–180°' }];
       },
     },
     hanche: {
@@ -57,7 +59,7 @@ KS.angles = (() => {
         { id: 'p2', label: 'Genou', lm: { D: 26, G: 25 } },
       ],
       metrics(a, side) {
-        return [{ label: 'Flexion de hanche' + sideTxt(side), value: r1(180 - a) + '°', norm: 'Norme AAOS : 0–120° genou fléchi · ~0–90° genou tendu' }];
+        return [{ label: 'Flexion de hanche' + sideTxt(side), value: degFr(180 - a), norm: 'Norme AAOS : 0–120° genou fléchi · ~0–90° genou tendu' }];
       },
     },
     genou: {
@@ -69,7 +71,7 @@ KS.angles = (() => {
         { id: 'p2', label: 'Cheville', lm: { D: 28, G: 27 } },
       ],
       metrics(a, side) {
-        return [{ label: 'Flexion du genou' + sideTxt(side), value: r1(180 - a) + '°', norm: 'Norme AAOS : flexion 0–135°, extension 0°' }];
+        return [{ label: 'Flexion du genou' + sideTxt(side), value: degFr(180 - a), norm: 'Norme AAOS : flexion 0–135°, extension 0°' }];
       },
     },
     cheville: {
@@ -83,9 +85,9 @@ KS.angles = (() => {
       metrics(a, side) {
         const pos = r1(90 - a);
         if (pos >= 0) {
-          return [{ label: 'Flexion dorsale' + sideTxt(side), value: pos + '°', norm: 'Norme AAOS : 0–20° (position neutre = 90° entre jambe et pied)' }];
+          return [{ label: 'Flexion dorsale' + sideTxt(side), value: degFr(pos), norm: 'Norme AAOS : 0–20° (position neutre = 90° entre jambe et pied)' }];
         }
-        return [{ label: 'Flexion plantaire' + sideTxt(side), value: -pos + '°', norm: 'Norme AAOS : 0–50° (position neutre = 90° entre jambe et pied)' }];
+        return [{ label: 'Flexion plantaire' + sideTxt(side), value: degFr(-pos), norm: 'Norme AAOS : 0–50° (position neutre = 90° entre jambe et pied)' }];
       },
     },
     libre: {
@@ -98,8 +100,8 @@ KS.angles = (() => {
       ],
       metrics(a) {
         return [
-          { label: 'Angle mesuré au sommet', value: r1(a) + '°' },
-          { label: 'Angle supplémentaire (180° − angle)', value: r1(180 - a) + '°' },
+          { label: 'Angle mesuré au sommet', value: degFr(a) },
+          { label: 'Angle supplémentaire (180° − angle)', value: degFr(180 - a) },
         ];
       },
     },
@@ -245,5 +247,5 @@ KS.angles = (() => {
     return rows;
   }
 
-  return { angleABC, tilt, dist, mid, r1, JOINTS, gonioMetrics, gonioTriplet, faceMetrics, profilMetrics, refFrame };
+  return { angleABC, tilt, dist, mid, r1, degFr, JOINTS, gonioMetrics, gonioTriplet, faceMetrics, profilMetrics, refFrame };
 })();
