@@ -74,14 +74,11 @@ KS.angles = (() => {
     },
     cheville: {
       label: 'Cheville — flexion dorsale / plantaire',
-      note: 'Photo de profil du pied. Tête de la fibula → malléole externe, puis 2 points sur le 5e métatarsien (base / styloïde et tête) : la ligne du pied passe par la malléole, parallèle au 5e métatarsien (méthode Norkin & White).',
-      // branche mobile virtuelle : passe par la malléole, parallèle à base → tête du 5e métatarsien
-      parallel: true,
+      note: 'Photo de profil du pied. Repères : tête de la fibula → malléole externe → 5e métatarsien (pastille).',
       points: [
         { id: 'p0', label: 'Tête fibula', lm: { D: 26, G: 25 }, def: [0.45, 0.15] },
         { id: 'p1', label: 'Malléole', lm: { D: 28, G: 27 }, def: [0.45, 0.62] },
-        { id: 'p2', label: 'Base 5e méta', lm: { D: 30, G: 29 }, def: [0.42, 0.76] },
-        { id: 'p3', label: 'Tête 5e méta', lm: { D: 32, G: 31 }, def: [0.75, 0.76] },
+        { id: 'p2', label: '5e méta', lm: { D: 32, G: 31 }, def: [0.75, 0.76] },
       ],
       metrics(a, side) {
         const pos = r1(90 - a);
