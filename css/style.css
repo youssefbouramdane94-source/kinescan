@@ -445,6 +445,17 @@ select {
 .legal .table-wrap { overflow-x: auto; }
 .todo { background: var(--warn-wash); color: var(--warn); font-weight: 700; padding: 0 0.25em; border-radius: 4px; }
 
+
+/* ---- confort tactile, zones de sécurité, ancres ---- */
+button, a, select, .chip { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+[id] { scroll-margin-top: 5rem; }
+kbd { font: 500 0.78em/1 var(--mono); padding: 0.12em 0.35em; border: 1px solid var(--line-strong); border-bottom-width: 2px; border-radius: 4px; background: var(--surface); }
+.head-inner { padding-top: max(0.7rem, env(safe-area-inset-top)); padding-left: max(var(--gutter), env(safe-area-inset-left)); padding-right: max(var(--gutter), env(safe-area-inset-right)); }
+.site-foot { padding-bottom: max(2.2rem, calc(1rem + env(safe-area-inset-bottom))); }
+.sheet { overscroll-behavior: contain; }
+#cv { user-select: none; -webkit-user-select: none; }
+#cv:focus-visible { outline-offset: 3px; }
+
 /* ================= toast ================= */
 #toast {
   position: fixed; left: 50%; bottom: calc(1.2rem + env(safe-area-inset-bottom)); transform: translateX(-50%);

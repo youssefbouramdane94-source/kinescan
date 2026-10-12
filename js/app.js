@@ -190,7 +190,8 @@
     Object.keys(pts).forEach((id) => {
       const c = toCv(pts[id]);
       const dragging = drag && id === drag.id;
-      drawRing(c, dragging ? '#ffd644' : '#14e0d6', dragging ? 9 : 6);
+      const keyed = !drag && document.activeElement === canvas && id === keySel;
+      drawRing(c, dragging || keyed ? '#ffd644' : '#14e0d6', dragging || keyed ? 9 : 6);
       if (dragging) return;
       if (id === 'p1') drawText(pointLabel(id), c.x - dir.x * 30, c.y - dir.y * 30 + 4, 11, 'center');
       else drawText(pointLabel(id), c.x + 9, c.y - 7, 11);
@@ -349,6 +350,29 @@
       drag = null;
       draw();
     }));
+
+  /* ---------- alternative clavier au glisser-déposer ----------
+     1 / 2 / 3 (4) : choisir un point ; flèches : le déplacer d'1 px écran (Maj : 10 px). */
+  let keySel = 'p1';
+  canvas.tabIndex = 0;
+  canvas.addEventListener('keydown', (e) => {
+    if (!state.img) return;
+    const ids = Object.keys(state.pts);
+    const n = Number(e.key);
+    if (n >= 1 && n <= ids.length) { keySel = ids[n - 1]; draw(); toast('Point sélectionné : ' + pointLabel(keySel)); e.preventDefault(); return; }
+    const step = (e.shiftKey ? 10 : 1) / view.scale;
+    const d = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] }[e.key];
+    if (!d || !state.pts[keySel]) return;
+    e.preventDefault();
+    const p = state.pts[keySel];
+    state.pts[keySel] = {
+      x: Math.max(0, Math.min(state.img.width, p.x + d[0])),
+      y: Math.max(0, Math.min(state.img.height, p.y + d[1])),
+    };
+    draw(); renderMetrics();
+  });
+  canvas.addEventListener('focus', () => draw());
+  canvas.addEventListener('blur', () => draw());
 
   /* ---------- métriques ---------- */
   const metrics = () => (state.img ? A.gonioMetrics(state.joint, state.side, state.pts) : []);
