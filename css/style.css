@@ -248,12 +248,12 @@ p { text-wrap: pretty; }
 .joint-tile.featured { grid-column: 1 / -1; background: var(--accent-wash); min-height: 9rem; }
 .joint-tile.featured .jt-name { font-size: 1.6rem; }
 .joint-tile.featured .jt-norm { color: var(--accent-ink); }
-.joint-tile.free { grid-column: 1 / -1; background: transparent; border: 1px dashed var(--line-strong); box-shadow: none; min-height: 6rem; }
+.joint-tile.free { background: transparent; border: 1px dashed var(--line-strong); box-shadow: none; }
 @media (min-width: 760px) {
   .joint-grid { grid-template-columns: repeat(4, 1fr); grid-auto-rows: minmax(8.4rem, auto); }
   .joint-tile.featured { grid-column: 1 / 3; grid-row: 1 / 3; padding: 1.4rem 1.4rem 3rem; }
   .joint-tile.featured .jt-name { font-size: 2.3rem; letter-spacing: -0.03em; }
-  .joint-tile.free { grid-column: 1 / -1; }
+  .joint-tile.wide { grid-column: span 2; }
 }
 
 .how { margin-top: var(--section); }

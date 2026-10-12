@@ -16,7 +16,7 @@ Accès : gratuit, sans inscription, sans cookie, sans mesure d'audience ; foncti
 
 ## Mesures disponibles
 
-- Goniométrie : épaule (élévation), coude, hanche, genou, cheville (flexion dorsale et plantaire), goniomètre libre à 3 points
+- Goniométrie : épaule (élévation), coude, poignet (flexion, extension, inclinaisons radiale et ulnaire), hanche, genou, cheville (flexion dorsale et plantaire), goniomètre libre à 3 points
 - En préparation : bilan morphostatique, rotations et abduction, prono-supination, inversion / éversion, niveau intégré
 
 ## Optional

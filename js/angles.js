@@ -38,6 +38,44 @@ KS.angles = (() => {
         return [{ label: 'Flexion du coude' + sideTxt(side), value: degFr(180 - a), norm: 'Norme AAOS : flexion 0–150°, extension 0°' }];
       },
     },
+    // Poignet (Norkin & White) : la position neutre est alignée (180°) ; le sens
+    // flexion / extension ne se déduit pas de 3 points, l'utilisateur le choisit.
+    poignet: {
+      label: 'Poignet — flexion',
+      note: 'Photo de profil, bord ulnaire. Repères : olécrane → triquétrum (sous la styloïde ulnaire) → tête du 5e métacarpien.',
+      points: [
+        { id: 'p0', label: 'Olécrane', lm: { D: 14, G: 13 } },
+        { id: 'p1', label: 'Triquétrum', lm: { D: 16, G: 15 } },
+        { id: 'p2', label: '5e méta', lm: { D: 18, G: 17 } },
+      ],
+      metrics(a, side) {
+        return [{ label: 'Flexion du poignet' + sideTxt(side), value: degFr(180 - a), norm: 'Norme AAOS : flexion 0–80°' }];
+      },
+    },
+    poignet_ext: {
+      label: 'Poignet — extension',
+      note: 'Photo de profil, bord ulnaire. Repères : olécrane → triquétrum (sous la styloïde ulnaire) → tête du 5e métacarpien.',
+      points: [
+        { id: 'p0', label: 'Olécrane', lm: { D: 14, G: 13 } },
+        { id: 'p1', label: 'Triquétrum', lm: { D: 16, G: 15 } },
+        { id: 'p2', label: '5e méta', lm: { D: 18, G: 17 } },
+      ],
+      metrics(a, side) {
+        return [{ label: 'Extension du poignet' + sideTxt(side), value: degFr(180 - a), norm: 'Norme AAOS : extension 0–70°' }];
+      },
+    },
+    poignet_incl: {
+      label: 'Poignet — inclinaison radiale / ulnaire',
+      note: 'Photo de la face dorsale, paume vers le bas. Repères : épicondyle latéral (milieu de l’avant-bras) → capitatum → tête du 3e métacarpien.',
+      points: [
+        { id: 'p0', label: 'Coude', lm: { D: 14, G: 13 } },
+        { id: 'p1', label: 'Capitatum', lm: { D: 16, G: 15 } },
+        { id: 'p2', label: '3e méta', lm: { D: 20, G: 19 } },
+      ],
+      metrics(a, side) {
+        return [{ label: 'Inclinaison du poignet' + sideTxt(side), value: degFr(180 - a), norm: 'Norme AAOS : radiale 0–20°, ulnaire 0–30°' }];
+      },
+    },
     epaule: {
       label: 'Épaule — élévation (flexion / abduction)',
       note: 'Vue de profil = flexion · vue de face = abduction. Repères : grand trochanter → acromion → épicondyle latéral.',
