@@ -1,8 +1,8 @@
-/* KinéScan — détection de pose (MediaPipe Pose Landmarker, chargé via CDN) */
+/* KinéScan — détection de pose (MediaPipe Pose Landmarker, hébergé localement : aucun service tiers) */
 window.KS = window.KS || {};
 KS.pose = (() => {
-  const CDN = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14';
-  const MODEL = 'https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task';
+  const LIB = new URL('../vendor/mediapipe/', document.currentScript.src).href;
+  const MODEL = new URL('../models/pose_landmarker_lite.task', document.currentScript.src).href;
 
   let landmarker = null;
   let status = 'chargement';
@@ -20,8 +20,8 @@ KS.pose = (() => {
 
   async function init() {
     try {
-      const { PoseLandmarker, FilesetResolver } = await import(CDN + '/+esm');
-      const vision = await FilesetResolver.forVisionTasks(CDN + '/wasm');
+      const { PoseLandmarker, FilesetResolver } = await import(LIB + 'vision_bundle.mjs');
+      const vision = await FilesetResolver.forVisionTasks(LIB + 'wasm');
       landmarker = await PoseLandmarker.createFromOptions(vision, {
         baseOptions: { modelAssetPath: MODEL },
         runningMode: 'IMAGE',

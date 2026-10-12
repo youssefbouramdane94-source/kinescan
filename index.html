@@ -2,125 +2,262 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#0e7c7b">
-<title>KinéScan — goniométrie &amp; bilan morphostatique</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f6f5f1">
+<title>KinéScan — goniométrie sur photo smartphone</title>
+<meta name="description" content="Outil web gratuit et pédagogique : mesurez une amplitude articulaire (goniométrie 2D) sur une photo smartphone. Version test. Les photos restent sur votre appareil.">
+<link rel="canonical" href="https://kinescan.vercel.app/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:site_name" content="KinéScan">
+<meta property="og:title" content="KinéScan — goniométrie sur photo smartphone">
+<meta property="og:description" content="Placez trois repères sur une photo, l’angle articulaire s’affiche. Gratuit, sans inscription, les photos ne quittent pas votre appareil.">
+<meta property="og:url" content="https://kinescan.vercel.app/">
+<meta property="og:image" content="https://kinescan.vercel.app/apple-touch-icon.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "KinéScan",
+  "url": "https://kinescan.vercel.app/",
+  "description": "Outil pédagogique de goniométrie 2D sur photo smartphone (version test). Mesures indicatives ; ne remplace pas l'examen clinique.",
+  "applicationCategory": "EducationalApplication",
+  "operatingSystem": "Navigateur web récent (iOS, Android, ordinateur)",
+  "inLanguage": "fr",
+  "isAccessibleForFree": true,
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "MAD" },
+  "featureList": [
+    "Goniométrie 2D : épaule, coude, hanche, genou, cheville, goniomètre libre à 3 points",
+    "Détection automatique des repères exécutée sur l'appareil, sans envoi de la photo",
+    "Loupe de précision pour placer les repères au doigt",
+    "Export du bilan en image PNG"
+  ]
+}
+</script>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preload" href="fonts/Geist-Variable.woff2" as="font" type="font/woff2" crossorigin>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="KinéScan">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+<a class="skip" href="#main">Aller au contenu</a>
 
 <header class="app-head">
-  <div class="brand">Kiné<span>Scan</span></div>
-  <span id="ai-pill" class="pill" data-s="chargement">IA : chargement…</span>
+  <div class="head-inner">
+    <a class="brand" href="./" aria-label="KinéScan, accueil">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><path d="M6 26 L16 9 L27 22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M12.6 15.2 A7.5 7.5 0 0 1 21.2 15.7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".55"/><circle cx="16" cy="9" r="3" fill="currentColor"/></svg>
+      <span>Kiné<b>Scan</b></span>
+    </a>
+    <span class="beta-flag" title="Version test : vos retours servent à améliorer l’application">Version test</span>
+    <span id="ai-pill" class="ai-status" data-s="chargement"><i aria-hidden="true"></i><span>IA : chargement…</span></span>
+    <button class="link-btn head-feedback" data-open-feedback type="button">Votre avis</button>
+  </div>
 </header>
 
-<main id="screen-home">
-  <p class="lede">Analyse posturale et mesure des amplitudes articulaires à partir d’une simple photo smartphone.</p>
-
-  <button class="mode-card" data-mode="gonio">
-    <span class="mc-emoji">📐</span>
-    <span class="mc-body">
-      <strong>Goniométrie</strong>
-      <small>Amplitudes articulaires : épaule, coude, hanche, genou, cheville — ou goniomètre libre à 3 points.</small>
-    </span>
-  </button>
-
-  <button class="mode-card" data-mode="face">
-    <span class="mc-emoji">🧍</span>
-    <span class="mc-body">
-      <strong>Morphostatique — vue de face</strong>
-      <small>Fil à plomb, inclinaison tête / épaules / bassin, axe des genoux (valgus–varus).</small>
-    </span>
-  </button>
-
-  <button class="mode-card" data-mode="profil">
-    <span class="mc-emoji">👤</span>
-    <span class="mc-body">
-      <strong>Morphostatique — vue de profil</strong>
-      <small>Fil à plomb virtuel par la malléole (redressé si la photo penche), angle crânio-vertébral, alignement oreille–épaule–hanche–genou, résultats en cm avec la taille.</small>
-    </span>
-  </button>
-
-  <div class="note">
-    ⚠️ Outil pédagogique (PFE kinésithérapie). Les mesures sont réalisées en 2D sur photo :
-    elles sont <strong>indicatives</strong> et ne remplacent ni le goniomètre clinique ni l’examen du praticien.
-  </div>
-</main>
-
-<main id="screen-work" hidden>
-  <div class="work-head">
-    <button id="btn-back" class="btn ghost" aria-label="Retour">←</button>
-    <h1 id="work-title"></h1>
-  </div>
-
-  <div id="bar-gonio" class="bar" hidden>
-    <select id="sel-joint" aria-label="Articulation"></select>
-    <div id="seg-side" class="seg" role="group" aria-label="Côté">
-      <button data-side="D" class="on">Droit</button>
-      <button data-side="G">Gauche</button>
+<main id="main">
+<section id="screen-home" aria-labelledby="home-title">
+  <div class="hero">
+    <div class="hero-copy">
+      <p class="eyebrow">Goniométrie 2D · smartphone</p>
+      <h1 id="home-title">Mesurez une amplitude articulaire sur une simple photo.</h1>
+      <p class="lede">Prenez la photo de profil, placez trois repères, l’angle s’affiche avec la norme de référence. Gratuit, sans inscription&nbsp;: la photo ne quitte jamais votre téléphone.</p>
+      <div class="hero-cta">
+        <button class="btn primary lg" data-joint="coude" type="button">Commencer une mesure</button>
+        <a class="text-link" href="#how">Comment ça marche</a>
+      </div>
     </div>
-    <p id="gonio-note" class="hint"></p>
+    <figure class="hero-visual" aria-hidden="true">
+      <svg viewBox="0 0 320 300" class="demo">
+        <defs>
+          <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" stroke="currentColor" stroke-width=".5" opacity=".14"/></pattern>
+        </defs>
+        <rect width="320" height="300" rx="22" fill="url(#grid)"/>
+        <path class="demo-seg" d="M92 40 L118 176 L247 152"/>
+        <path class="demo-arc" d="M112.4 146.5 A30 30 0 0 1 147.5 170.5"/>
+        <circle class="demo-pt" cx="92" cy="40" r="7"/>
+        <circle class="demo-pt" cx="118" cy="176" r="7"/>
+        <circle class="demo-pt" cx="247" cy="152" r="7"/>
+        <g class="demo-pill"><rect x="121" y="111" width="88" height="34" rx="17"/><text x="165" y="134" text-anchor="middle">90,3°</text></g>
+        <text class="demo-lab" x="104" y="36">acromion</text>
+        <text class="demo-lab" x="40" y="204">épicondyle</text>
+        <text class="demo-lab" x="214" y="182">styloïde</text>
+      </svg>
+      <figcaption>Angle au coude 90,3° → flexion 89,7° · norme AAOS 0–150°</figcaption>
+    </figure>
   </div>
 
-  <div id="bar-profil" class="bar" hidden>
-    <span class="bar-label">Le sujet regarde vers :</span>
-    <div id="seg-facing" class="seg" role="group" aria-label="Orientation">
-      <button data-facing="gauche" class="on">← Gauche</button>
-      <button data-facing="droite">Droite →</button>
+  <section class="joints" aria-labelledby="joints-title">
+    <div class="section-head">
+      <h2 id="joints-title">Choisissez l’articulation</h2>
+      <p>Mouvements mesurés dans le plan de la photo (vue de profil).</p>
+    </div>
+    <div class="joint-grid">
+      <button class="joint-tile featured" data-joint="coude" type="button"><span class="jt-name">Coude</span><span class="jt-move">Flexion / extension</span><span class="jt-norm">0–150°</span></button>
+      <button class="joint-tile" data-joint="genou" type="button"><span class="jt-name">Genou</span><span class="jt-move">Flexion / extension</span><span class="jt-norm">0–135°</span></button>
+      <button class="joint-tile" data-joint="cheville" type="button"><span class="jt-name">Cheville</span><span class="jt-move">Flexion dorsale / plantaire</span><span class="jt-norm">+20° / −50°</span></button>
+      <button class="joint-tile" data-joint="epaule" type="button"><span class="jt-name">Épaule</span><span class="jt-move">Élévation</span><span class="jt-norm">0–180°</span></button>
+      <button class="joint-tile" data-joint="hanche" type="button"><span class="jt-name">Hanche</span><span class="jt-move">Flexion</span><span class="jt-norm">0–120°</span></button>
+      <button class="joint-tile free" data-joint="libre" type="button"><span class="jt-name">Goniomètre libre</span><span class="jt-move">3 points, n’importe quel angle</span><span class="jt-norm">0–180°</span></button>
+    </div>
+  </section>
+
+  <section id="how" class="how" aria-labelledby="how-title">
+    <h2 id="how-title">Comment ça marche</h2>
+    <ol class="steps">
+      <li><span class="step-n">01</span><div><strong>Photo bien droite</strong><p>Activez le niveau de l’appareil photo et placez le téléphone perpendiculaire au mouvement, à hauteur de l’articulation.</p></div></li>
+      <li><span class="step-n">02</span><div><strong>Trois repères</strong><p>L’IA propose les points, vous les ajustez au doigt avec la loupe, idéalement sur des pastilles collées sur les repères osseux.</p></div></li>
+      <li><span class="step-n">03</span><div><strong>L’angle et sa norme</strong><p>La valeur s’affiche avec la norme AAOS. Exportez le bilan en image si besoin.</p></div></li>
+    </ol>
+  </section>
+
+  <section class="roadmap" aria-labelledby="road-title">
+    <div class="section-head">
+      <h2 id="road-title">Bientôt dans KinéScan</h2>
+      <p>Cette version test sert à recueillir vos retours. Les prochaines fonctions arrivent selon vos avis.</p>
+    </div>
+    <ul class="road-list">
+      <li><span>Bilan morphostatique</span><small>face et profil, fil à plomb virtuel</small></li>
+      <li><span>Rotations et abduction</span><small>épaule, hanche</small></li>
+      <li><span>Prono-supination</span><small>méthode du crayon</small></li>
+      <li><span>Inversion / éversion</span><small>arrière-pied</small></li>
+      <li><span>Niveau intégré</span><small>photo redressée automatiquement</small></li>
+    </ul>
+    <button class="btn" data-open-feedback type="button">Proposer une amélioration</button>
+  </section>
+
+  <p class="note">Outil pédagogique issu d’un projet de fin d’études en kinésithérapie. Les mesures sont réalisées en 2D sur photo&nbsp;: elles sont <strong>indicatives</strong> et ne remplacent ni le goniomètre clinique ni l’examen du praticien. KinéScan n’est pas un dispositif médical.</p>
+</section>
+
+<section id="screen-work" hidden aria-labelledby="work-title">
+  <div class="work-bar">
+    <button id="btn-back" class="icon-btn" type="button" aria-label="Retour à l’accueil"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5 8 12l7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <h1 id="work-title">Goniométrie</h1>
+    <div class="work-controls">
+      <label class="sr-only" for="sel-joint">Articulation</label>
+      <select id="sel-joint"></select>
+      <div id="seg-side" class="seg" role="group" aria-label="Côté mesuré">
+        <button data-side="D" class="on" aria-pressed="true" type="button">Droit</button>
+        <button data-side="G" aria-pressed="false" type="button">Gauche</button>
+      </div>
     </div>
   </div>
+  <p id="gonio-note" class="joint-note"></p>
 
-  <div id="bar-ref" class="bar" hidden>
-    <label class="check">
-      <input type="checkbox" id="chk-vert">
-      Redresser avec une verticale de la photo <small>(fil, porte, angle de mur)</small>
-    </label>
-    <label class="inline-num">
-      Taille du sujet :
-      <input type="number" id="in-taille" inputmode="decimal" min="50" max="250" step="0.5" placeholder="ex. 179"> cm
-    </label>
-    <p id="ref-hint" class="hint"></p>
-    <p class="level-tip">📐 <strong>Avant la photo</strong>, activez le niveau de l’appareil photo :
-      iPhone : Réglages › Appareil photo › Niveau · Android : Appareil photo › Paramètres › Grille / Niveau.
-      Photographiez quand la ligne du niveau est droite.</p>
-  </div>
-
-  <div id="cv-wrap">
-    <canvas id="cv" hidden></canvas>
-    <div id="empty">
-      <p>Ajoutez une photo du sujet pour commencer.<br>
-      <small>Sujet entier ou segment concerné, appareil bien perpendiculaire au plan à mesurer.
-      Activez le niveau de l’appareil photo pour que la photo soit droite.</small></p>
-      <button id="btn-photo-empty" class="btn primary">📷 Prendre / choisir une photo</button>
+  <div id="cv-wrap" class="stage">
+    <canvas id="cv" hidden role="img" aria-label="Photo annotée avec les repères et l’angle. Les valeurs mesurées sont listées sous l’image."></canvas>
+    <div id="empty" class="empty">
+      <svg viewBox="0 0 48 48" aria-hidden="true"><rect x="6" y="12" width="36" height="26" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="24" cy="25" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M17 12l3-5h8l3 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+      <p><strong>Ajoutez une photo de profil</strong><br>
+      Segment entier visible, téléphone perpendiculaire au mouvement, niveau de l’appareil photo activé.</p>
+      <button id="btn-photo-empty" class="btn primary" type="button">Prendre ou choisir une photo</button>
     </div>
   </div>
 
   <div class="actions">
-    <button id="btn-photo" class="btn">📷 Photo</button>
-    <button id="btn-detect" class="btn">✨ Détection auto</button>
-    <button id="btn-export" class="btn">💾 Bilan PNG</button>
+    <button id="btn-photo" class="btn primary" type="button">Nouvelle photo</button>
+    <button id="btn-detect" class="btn" type="button">Détection auto</button>
+    <button id="btn-export" class="link-btn" type="button">Exporter le bilan (PNG)</button>
   </div>
+  <p class="hint">Faites glisser un point : une loupe apparaît pour viser précisément. <strong>D</strong> = côté droit du sujet.</p>
 
-  <p class="hint">Faites glisser les points pour les ajuster. <strong>D</strong> = côté droit du sujet
-  (face à la caméra, son côté droit apparaît à gauche de l’image).</p>
+  <div id="metrics" aria-live="polite"></div>
 
-  <div id="metrics"></div>
+  <aside class="work-feedback">
+    <p>Un résultat bizarre, une idée&nbsp;? Votre avis améliore la prochaine version.</p>
+    <button class="btn" data-open-feedback type="button">Donner mon avis</button>
+  </aside>
 
-  <p class="foot">Mesures 2D indicatives — sensibles au cadrage, à la distance et à la perpendicularité
-  de la prise de vue. Ne remplace pas l’examen clinique.</p>
+  <p class="foot">Mesures 2D indicatives, sensibles au cadrage, à la distance et à la perpendicularité de la prise de vue. Ne remplace pas l’examen clinique.</p>
+</section>
 </main>
+
+<footer class="site-foot">
+  <p class="privacy-line">Vos photos restent sur votre appareil&nbsp;: rien n’est envoyé ni enregistré.</p>
+  <nav aria-label="Informations légales">
+    <a href="mentions-legales.html">Mentions légales</a>
+    <a href="confidentialite.html">Confidentialité</a>
+    <a href="cgu.html">Conditions d’utilisation</a>
+    <a href="mailto:kinescancontact@gmail.com">Contact</a>
+  </nav>
+</footer>
+
+<dialog id="feedback" class="sheet" aria-labelledby="fb-title">
+  <form method="dialog" class="sheet-inner" id="fb-form" novalidate>
+    <div class="sheet-head">
+      <h2 id="fb-title">Votre avis sur la version test</h2>
+      <button class="icon-btn" value="close" type="submit" aria-label="Fermer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    </div>
+
+    <fieldset class="fb-group">
+      <legend>Note globale <span class="req">obligatoire</span></legend>
+      <div class="rating" role="radiogroup" aria-label="Note de 1 à 5">
+        <button type="button" role="radio" aria-checked="false" data-rate="1">1</button>
+        <button type="button" role="radio" aria-checked="false" data-rate="2">2</button>
+        <button type="button" role="radio" aria-checked="false" data-rate="3">3</button>
+        <button type="button" role="radio" aria-checked="false" data-rate="4">4</button>
+        <button type="button" role="radio" aria-checked="false" data-rate="5">5</button>
+      </div>
+      <p class="fb-error" id="fb-error" hidden>Choisissez une note de 1 à 5.</p>
+    </fieldset>
+
+    <fieldset class="fb-group">
+      <legend>Vous êtes</legend>
+      <div class="chips" data-single="profile">
+        <button type="button" class="chip" aria-pressed="false">Kinésithérapeute</button>
+        <button type="button" class="chip" aria-pressed="false">Étudiant(e) en kiné</button>
+        <button type="button" class="chip" aria-pressed="false">Autre professionnel de santé</button>
+        <button type="button" class="chip" aria-pressed="false">Particulier</button>
+      </div>
+    </fieldset>
+
+    <fieldset class="fb-group">
+      <legend>À améliorer</legend>
+      <div class="chips" data-multi="improve">
+        <button type="button" class="chip" aria-pressed="false">Placement des points</button>
+        <button type="button" class="chip" aria-pressed="false">Détection automatique</button>
+        <button type="button" class="chip" aria-pressed="false">Précision des mesures</button>
+        <button type="button" class="chip" aria-pressed="false">Lisibilité des résultats</button>
+        <button type="button" class="chip" aria-pressed="false">Facilité d’utilisation</button>
+        <button type="button" class="chip" aria-pressed="false">Design</button>
+      </div>
+    </fieldset>
+
+    <fieldset class="fb-group">
+      <legend>À ajouter en priorité</legend>
+      <div class="chips" data-multi="add">
+        <button type="button" class="chip" aria-pressed="false">Bilan morphostatique</button>
+        <button type="button" class="chip" aria-pressed="false">Rotations</button>
+        <button type="button" class="chip" aria-pressed="false">Abduction</button>
+        <button type="button" class="chip" aria-pressed="false">Prono-supination</button>
+        <button type="button" class="chip" aria-pressed="false">Inversion / éversion</button>
+        <button type="button" class="chip" aria-pressed="false">Niveau intégré</button>
+      </div>
+    </fieldset>
+
+    <label class="fb-group fb-text">
+      <span class="legend">Commentaire <span class="req">facultatif</span></span>
+      <textarea id="fb-comment" rows="3" maxlength="800" placeholder="Ce qui vous a plu, ce qui vous a gêné…"></textarea>
+    </label>
+
+    <div class="sheet-actions">
+      <button type="button" class="btn primary" id="fb-whatsapp">Envoyer par WhatsApp</button>
+      <button type="button" class="btn" id="fb-email">Envoyer par email</button>
+    </div>
+    <p class="fb-privacy">L’envoi passe par votre WhatsApp ou votre messagerie&nbsp;: vous relisez le message avant de l’envoyer. Aucune photo n’est jointe.</p>
+  </form>
+</dialog>
 
 <input type="file" id="file" accept="image/*" hidden>
 <div id="toast" hidden></div>
+<div id="sr-status" class="sr-only" role="status" aria-live="polite"></div>
 
 <script src="js/angles.js"></script>
 <script src="js/pose.js"></script>
 <script src="js/report.js"></script>
+<script src="js/feedback.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

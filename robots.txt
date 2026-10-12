@@ -1,0 +1,21 @@
+# KinéScan — robots.txt
+# Moteurs de recherche et moteurs de réponse IA (qui citent leurs sources) : autorisés.
+# Ex. Googlebot, Bingbot, OAI-SearchBot, ChatGPT-User, Claude-SearchBot, Claude-User,
+#     PerplexityBot, Perplexity-User.
+User-agent: *
+Allow: /
+
+# Robots qui collectent du contenu pour ENTRAÎNER des modèles d'IA : refusés.
+# (robots.txt est une consigne volontaire, respectée par les acteurs listés.)
+User-agent: GPTBot
+User-agent: ClaudeBot
+User-agent: anthropic-ai
+User-agent: Google-Extended
+User-agent: Applebot-Extended
+User-agent: CCBot
+User-agent: meta-externalagent
+User-agent: Bytespider
+User-agent: cohere-training-data-crawler
+Disallow: /
+
+Sitemap: https://kinescan.vercel.app/sitemap.xml

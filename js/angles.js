@@ -227,7 +227,7 @@ KS.angles = (() => {
       label: 'Angle crânio-vertébral (approx. tragus–acromion)',
       value: cva + '°',
       detail: cva >= 48 ? 'posture de tête dans la norme' : 'tête projetée en avant',
-      norm: 'Norme : ≥ 48°', status: cva >= 48 ? 'ok' : 'warn',
+      norm: 'Seuil usuel dans la littérature : ≥ 48° (en dessous : tête projetée en avant)', status: cva >= 48 ? 'ok' : 'warn',
     });
 
     // Fil à plomb passant par la malléole externe

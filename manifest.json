@@ -1,11 +1,11 @@
 {
   "name": "KinéScan",
   "short_name": "KinéScan",
-  "description": "Goniométrie et bilan morphostatique à partir d'une photo smartphone",
+  "description": "Goniométrie 2D à partir d'une photo smartphone (version test)",
   "start_url": ".",
   "display": "standalone",
-  "background_color": "#f7f7f4",
-  "theme_color": "#0e7c7b",
+  "background_color": "#f6f5f1",
+  "theme_color": "#f6f5f1",
   "lang": "fr",
   "icons": [
     { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
