@@ -58,7 +58,11 @@
     </a>
     <span class="beta-flag" title="Version test : vos retours servent à améliorer l’application">Version test</span>
     <span id="ai-pill" class="ai-status" data-s="chargement"><i aria-hidden="true"></i><span>IA : chargement…</span></span>
-    <a class="head-nav" href="#/patients" aria-label="Mes patients"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M4.8 20c.9-3.6 3.7-5.6 7.2-5.6s6.3 2 7.2 5.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>Patients</span></a>
+    <nav class="head-links" aria-label="Navigation principale">
+      <a href="#/mesure" data-nav="mesure">Mesurer</a>
+      <a href="#/patients" data-nav="patients">Patients</a>
+    </nav>
+    <button class="head-install" data-install data-install-card hidden type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 19.5h14" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Installer</span></button>
     <button class="link-btn head-feedback" data-open-feedback type="button" aria-label="Votre avis"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14v10H10l-4 4v-4H5z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><span>Votre avis</span></button>
   </div>
 </header>
@@ -72,7 +76,6 @@
       <p class="lede">Prenez la photo de profil, placez trois repères, l’angle s’affiche avec la norme de référence. Enregistrez-le dans le dossier du patient pour suivre son évolution. Gratuit, sans inscription&nbsp;: tout reste sur votre téléphone.</p>
       <div class="hero-cta">
         <button class="btn primary lg" data-joint="coude" type="button">Commencer une mesure</button>
-        <a class="btn lg" href="#/patients">Mes patients</a>
         <a class="text-link" href="#how">Comment ça marche</a>
       </div>
     </div>
@@ -95,15 +98,6 @@
       <figcaption>Angle au coude 90,3° → flexion 89,7° · norme AAOS 0–150°</figcaption>
     </figure>
   </div>
-
-  <aside class="install-card" data-install-card hidden aria-labelledby="inst-title">
-    <img src="icon-192.png" alt="" width="56" height="56">
-    <div>
-      <h2 id="inst-title">Installez KinéScan sur votre téléphone</h2>
-      <p>Une icône sur l’écran d’accueil, l’appli marche sans internet et vos dossiers patients sont mieux protégés.</p>
-    </div>
-    <button class="btn primary" data-install type="button">Installer</button>
-  </aside>
 
   <section class="joints" aria-labelledby="joints-title">
     <div class="section-head">
@@ -197,19 +191,21 @@
 
 <section id="screen-patients" hidden aria-labelledby="pts-title">
   <div class="work-bar">
-    <a class="icon-btn" href="#/" aria-label="Retour à l’accueil"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5 8 12l7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
     <h1 id="pts-title">Mes patients <span id="pt-count" class="count"></span></h1>
     <button class="btn primary" data-new-patient type="button">Nouveau patient</button>
   </div>
   <p class="local-note"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg><span>Les dossiers restent <strong>uniquement sur ce téléphone</strong>&nbsp;: rien n’est envoyé. Pensez à faire une sauvegarde.</span></p>
 
-  <aside class="install-card" data-install-card hidden aria-labelledby="inst2-title">
+  <aside class="install-card" data-install-card data-dismissible hidden aria-labelledby="inst2-title">
     <img src="icon-192.png" alt="" width="56" height="56">
     <div>
       <h2 id="inst2-title">Installez l’appli pour protéger vos dossiers</h2>
       <p>Sur iPhone, un site non installé peut perdre ses données s’il n’est pas ouvert pendant quelques jours.</p>
     </div>
-    <button class="btn primary" data-install type="button">Installer</button>
+    <div class="install-actions">
+      <button class="btn primary" data-install type="button">Installer</button>
+      <button class="link-btn" data-install-dismiss type="button">Plus tard</button>
+    </div>
   </aside>
 
   <div id="pt-search-wrap" class="search">
@@ -259,6 +255,12 @@
   <p class="foot">Mesures 2D indicatives. Le dossier KinéScan ne remplace pas le dossier patient réglementaire du cabinet.</p>
 </section>
 </main>
+
+<nav class="tabbar" aria-label="Navigation principale">
+  <a href="#/" data-nav="accueil"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5V19a1 1 0 0 1-1 1h-4.5v-5.5h-5V20H5a1 1 0 0 1-1-1z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><span>Accueil</span></a>
+  <a href="#/mesure" data-nav="mesure"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19 12 6l7 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.4 13.4a5 5 0 0 1 7.2 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="6" r="1.8" fill="currentColor"/></svg><span>Mesurer</span></a>
+  <a href="#/patients" data-nav="patients"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M4.8 20c.9-3.6 3.7-5.6 7.2-5.6s6.3 2 7.2 5.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>Patients</span></a>
+</nav>
 
 <footer class="site-foot">
   <p class="privacy-line">Vos photos et vos dossiers patients restent sur votre appareil&nbsp;: rien n’est envoyé.</p>

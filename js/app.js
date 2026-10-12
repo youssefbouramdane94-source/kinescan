@@ -27,8 +27,18 @@
     return true;
   }
 
+  // onglet actif (barre du bas sur téléphone, liens de l'entête sur ordinateur)
+  function setNav(h) {
+    const cur = h === '#/mesure' ? 'mesure' : h.startsWith('#/patient') ? 'patients' : 'accueil';
+    $$('[data-nav]').forEach((a) => {
+      if (a.dataset.nav === cur) a.setAttribute('aria-current', 'page');
+      else a.removeAttribute('aria-current');
+    });
+  }
+
   function route() {
     const h = location.hash;
+    setNav(h);
     if (h === '#/mesure') {
       showScreen('work');
       if (state.img) { layout(); draw(); renderMetrics(); }

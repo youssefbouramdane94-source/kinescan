@@ -10,7 +10,21 @@ KS.install = (() => {
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   const secure = location.protocol === 'https:' || ['localhost', '127.0.0.1'].includes(location.hostname);
 
-  const showCards = (on) => $$('[data-install-card]').forEach((c) => { c.hidden = !on; });
+  // « Plus tard » : l'encart contextuel se fait oublier 30 jours (préférence locale, rien n'est envoyé)
+  const DISMISS_KEY = 'ks-install-later', DISMISS_MS = 30 * 864e5;
+  function dismissedRecently() {
+    try { return Date.now() - Number(localStorage.getItem(DISMISS_KEY) || 0) < DISMISS_MS; } catch (e) { return false; }
+  }
+  let available = false;
+  function showCards(on) {
+    available = on;
+    $$('[data-install-card]').forEach((c) => { c.hidden = !on || (c.hasAttribute('data-dismissible') && dismissedRecently()); });
+  }
+  function later(btn) {
+    try { localStorage.setItem(DISMISS_KEY, String(Date.now())); } catch (e) { /* stockage bloqué : masquage pour cette visite seulement */ }
+    const card = btn.closest('[data-install-card]');
+    if (card) card.hidden = true;
+  }
 
   async function install() {
     if (deferred) {
@@ -37,7 +51,8 @@ KS.install = (() => {
     });
     if (isIOS) showCards(true);
     $$('[data-install]').forEach((b) => b.addEventListener('click', install));
+    $$('[data-install-dismiss]').forEach((b) => b.addEventListener('click', () => later(b)));
   }
 
-  return { init, standalone, isIOS };
+  return { init, standalone, isIOS, get available() { return available; } };
 })();
