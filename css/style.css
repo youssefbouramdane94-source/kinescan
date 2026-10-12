@@ -137,7 +137,7 @@ p { text-wrap: pretty; }
 @media (max-width: 560px) {
   .ai-status span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 }
-@media (max-width: 370px) { .beta-flag { display: none; } }
+@media (max-width: 330px) { .beta-flag { display: none; } }
 
 /* ================= boutons ================= */
 .btn {

@@ -29,10 +29,14 @@
   .head-feedback span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 }
 @media (max-width: 430px) {
-  .head-inner { gap: 0.45rem; }
+  .head-inner { gap: 0.4rem; }
+  .bf-long { display: none; }
+}
+@media (max-width: 340px) {
   .head-install { width: 40px; height: 40px; padding: 0; justify-content: center; }
   .head-install span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 }
+.btn-patients svg { width: 20px; height: 20px; color: var(--accent); }
 
 /* ---------- barre d'onglets (téléphone) ---------- */
 .tabbar {
