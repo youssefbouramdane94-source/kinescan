@@ -90,9 +90,9 @@ KS.angles = (() => {
     },
     hanche: {
       label: 'Hanche — flexion',
-      note: 'Photo de profil. Repères : acromion (tronc) → grand trochanter → condyle latéral du genou.',
+      note: 'Photo de profil. Repères : creux axillaire (ligne médio-axillaire du tronc) → grand trochanter → condyle latéral du genou.',
       points: [
-        { id: 'p0', label: 'Épaule', lm: { D: 12, G: 11 } },
+        { id: 'p0', label: 'Creux axillaire', lm: { D: 12, G: 11 } },
         { id: 'p1', label: 'Hanche', lm: { D: 24, G: 23 } },
         { id: 'p2', label: 'Genou', lm: { D: 26, G: 25 } },
       ],
