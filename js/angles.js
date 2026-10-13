@@ -30,9 +30,9 @@ KS.angles = (() => {
       label: 'Coude — flexion / extension',
       note: 'Repères : acromion → épicondyle latéral → styloïde radiale. Photo de profil du bras.',
       points: [
-        { id: 'p0', label: 'Épaule', lm: { D: 12, G: 11 } },
-        { id: 'p1', label: 'Coude', lm: { D: 14, G: 13 } },
-        { id: 'p2', label: 'Poignet', lm: { D: 16, G: 15 } },
+        { id: 'p0', label: 'Acromion', lm: { D: 12, G: 11 } },
+        { id: 'p1', label: 'Épicondyle lat.', lm: { D: 14, G: 13 } },
+        { id: 'p2', label: 'Styloïde radiale', lm: { D: 16, G: 15 } },
       ],
       metrics(a, side) {
         return [{ label: 'Flexion du coude' + sideTxt(side), value: degFr(180 - a), norm: 'Norme AAOS : flexion 0–150°, extension 0°' }];
@@ -42,7 +42,7 @@ KS.angles = (() => {
     // flexion / extension ne se déduit pas de 3 points, l'utilisateur le choisit.
     poignet: {
       label: 'Poignet — flexion',
-      note: 'Photo de profil, bord ulnaire. Repères : olécrane → triquétrum (sous la styloïde ulnaire) → tête du 5e métacarpien.',
+      note: 'Méthode latérale (bord ulnaire), photo de profil. Repères : olécrane → triquétrum (sous la styloïde ulnaire) → tête du 5e métacarpien.',
       points: [
         { id: 'p0', label: 'Olécrane', lm: { D: 14, G: 13 } },
         { id: 'p1', label: 'Triquétrum', lm: { D: 16, G: 15 } },
@@ -54,7 +54,7 @@ KS.angles = (() => {
     },
     poignet_ext: {
       label: 'Poignet — extension',
-      note: 'Photo de profil, bord ulnaire. Repères : olécrane → triquétrum (sous la styloïde ulnaire) → tête du 5e métacarpien.',
+      note: 'Méthode latérale (bord ulnaire), photo de profil. Repères : olécrane → triquétrum (sous la styloïde ulnaire) → tête du 5e métacarpien.',
       points: [
         { id: 'p0', label: 'Olécrane', lm: { D: 14, G: 13 } },
         { id: 'p1', label: 'Triquétrum', lm: { D: 16, G: 15 } },
@@ -66,9 +66,9 @@ KS.angles = (() => {
     },
     poignet_incl: {
       label: 'Poignet — inclinaison radiale / ulnaire',
-      note: 'Photo de la face dorsale, paume vers le bas. Repères : épicondyle latéral (milieu de l’avant-bras) → capitatum → tête du 3e métacarpien.',
+      note: 'Photo de la face dorsale, paume vers le bas. Repères : épicondyle latéral (ligne médiane dorsale de l’avant-bras) → capitatum → tête du 3e métacarpien.',
       points: [
-        { id: 'p0', label: 'Coude', lm: { D: 14, G: 13 } },
+        { id: 'p0', label: 'Épicondyle lat.', lm: { D: 14, G: 13 } },
         { id: 'p1', label: 'Capitatum', lm: { D: 16, G: 15 } },
         { id: 'p2', label: '3e méta', lm: { D: 20, G: 19 } },
       ],
@@ -78,11 +78,11 @@ KS.angles = (() => {
     },
     epaule: {
       label: 'Épaule — élévation (flexion / abduction)',
-      note: 'Vue de profil = flexion · vue de face = abduction. Repères : grand trochanter → acromion → épicondyle latéral.',
+      note: 'Vue de profil = flexion · vue de face = abduction. Repères : ligne du tronc (grand trochanter) → centre de la tête humérale, sous l’acromion → épicondyle latéral.',
       points: [
-        { id: 'p0', label: 'Hanche', lm: { D: 24, G: 23 } },
-        { id: 'p1', label: 'Épaule', lm: { D: 12, G: 11 } },
-        { id: 'p2', label: 'Coude', lm: { D: 14, G: 13 } },
+        { id: 'p0', label: 'Grand trochanter', lm: { D: 24, G: 23 } },
+        { id: 'p1', label: 'Tête humérale', lm: { D: 12, G: 11 } },
+        { id: 'p2', label: 'Épicondyle lat.', lm: { D: 14, G: 13 } },
       ],
       metrics(a, side) {
         return [{ label: 'Élévation de l’épaule' + sideTxt(side), value: degFr(a), norm: 'Norme AAOS : flexion 0–180° · abduction 0–180°' }];
@@ -90,11 +90,11 @@ KS.angles = (() => {
     },
     hanche: {
       label: 'Hanche — flexion',
-      note: 'Photo de profil. Repères : creux axillaire (ligne médio-axillaire du tronc) → grand trochanter → condyle latéral du genou.',
+      note: 'Photo de profil. Repères : creux axillaire (ligne médio-axillaire du tronc) → grand trochanter → épicondyle latéral du fémur.',
       points: [
         { id: 'p0', label: 'Creux axillaire', lm: { D: 12, G: 11 } },
-        { id: 'p1', label: 'Hanche', lm: { D: 24, G: 23 } },
-        { id: 'p2', label: 'Genou', lm: { D: 26, G: 25 } },
+        { id: 'p1', label: 'Grand trochanter', lm: { D: 24, G: 23 } },
+        { id: 'p2', label: 'Épicondyle lat.', lm: { D: 26, G: 25 } },
       ],
       metrics(a, side) {
         return [{ label: 'Flexion de hanche' + sideTxt(side), value: degFr(180 - a), norm: 'Norme AAOS : 0–120° genou fléchi · ~0–90° genou tendu' }];
@@ -102,11 +102,11 @@ KS.angles = (() => {
     },
     genou: {
       label: 'Genou — flexion / extension',
-      note: 'Photo de profil. Repères : grand trochanter → condyle latéral → malléole externe.',
+      note: 'Photo de profil. Repères : grand trochanter → épicondyle latéral du fémur → malléole externe.',
       points: [
-        { id: 'p0', label: 'Hanche', lm: { D: 24, G: 23 } },
-        { id: 'p1', label: 'Genou', lm: { D: 26, G: 25 } },
-        { id: 'p2', label: 'Cheville', lm: { D: 28, G: 27 } },
+        { id: 'p0', label: 'Grand trochanter', lm: { D: 24, G: 23 } },
+        { id: 'p1', label: 'Épicondyle lat.', lm: { D: 26, G: 25 } },
+        { id: 'p2', label: 'Malléole ext.', lm: { D: 28, G: 27 } },
       ],
       metrics(a, side) {
         return [{ label: 'Flexion du genou' + sideTxt(side), value: degFr(180 - a), norm: 'Norme AAOS : flexion 0–135°, extension 0°' }];
