@@ -266,6 +266,11 @@
   function drawText(txt, x, y, size, align = 'left') {
     ctx.save();
     ctx.font = '600 ' + size + 'px Geist, system-ui, sans-serif';
+    // le libellé reste toujours dans l'image (sinon « Styloïde radiale » est coupé au bord)
+    const w = ctx.measureText(txt).width, M = 4;
+    const left = align === 'center' ? x - w / 2 : x;
+    const shift = Math.min(0, view.w - M - (left + w)) + Math.max(0, M - left);
+    x += shift;
     ctx.textAlign = align;
     ctx.lineWidth = 3;
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
