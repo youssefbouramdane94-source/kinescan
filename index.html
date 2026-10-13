@@ -27,7 +27,7 @@
   "isAccessibleForFree": true,
   "offers": { "@type": "Offer", "price": "0", "priceCurrency": "MAD" },
   "featureList": [
-    "Goniométrie 2D : épaule, coude, poignet, hanche, genou, cheville, goniomètre libre à 3 points",
+    "Goniométrie 2D : épaule (flexion, extension, abduction), coude, poignet, hanche, genou, cheville, goniomètre libre à 3 points",
     "Détection automatique des repères exécutée sur l'appareil, sans envoi de la photo",
     "Loupe de précision pour placer les repères au doigt",
     "Export du bilan en image PNG",
@@ -109,7 +109,7 @@
       <button class="joint-tile featured" data-joint="coude" type="button"><span class="jt-name">Coude</span><span class="jt-move">Flexion / extension</span><span class="jt-norm">0–150°</span></button>
       <button class="joint-tile" data-joint="genou" type="button"><span class="jt-name">Genou</span><span class="jt-move">Flexion / extension</span><span class="jt-norm">0–135°</span></button>
       <button class="joint-tile" data-joint="cheville" type="button"><span class="jt-name">Cheville</span><span class="jt-move">Flexion dorsale / plantaire</span><span class="jt-norm">+20° / −50°</span></button>
-      <button class="joint-tile" data-joint="epaule" type="button"><span class="jt-name">Épaule</span><span class="jt-move">Élévation</span><span class="jt-norm">0–180°</span></button>
+      <button class="joint-tile" data-joint="epaule" type="button"><span class="jt-name">Épaule</span><span class="jt-move">Flexion, extension, abduction</span><span class="jt-norm">0–180° · 0–60°</span></button>
       <button class="joint-tile" data-joint="hanche" type="button"><span class="jt-name">Hanche</span><span class="jt-move">Flexion</span><span class="jt-norm">0–120°</span></button>
       <button class="joint-tile wide" data-joint="poignet" type="button"><span class="jt-name">Poignet</span><span class="jt-move">Flexion / extension, inclinaisons</span><span class="jt-norm">0–80° · 0–70°</span></button>
       <button class="joint-tile free wide" data-joint="libre" type="button"><span class="jt-name">Goniomètre libre</span><span class="jt-move">3 points, n’importe quel angle</span><span class="jt-norm">0–180°</span></button>
@@ -132,7 +132,7 @@
     </div>
     <ul class="road-list">
       <li><span>Bilan morphostatique</span><small>face et profil, fil à plomb virtuel</small></li>
-      <li><span>Rotations et abduction</span><small>épaule, hanche</small></li>
+      <li><span>Rotations et abduction de hanche</span><small>rotations d’épaule et de hanche, abduction de hanche</small></li>
       <li><span>Prono-supination</span><small>méthode du crayon</small></li>
       <li><span>Inversion / éversion</span><small>arrière-pied</small></li>
       <li><span>Niveau intégré</span><small>photo redressée automatiquement</small></li>
@@ -320,7 +320,7 @@
       <div class="chips" data-multi="add">
         <button type="button" class="chip" aria-pressed="false">Bilan morphostatique</button>
         <button type="button" class="chip" aria-pressed="false">Rotations</button>
-        <button type="button" class="chip" aria-pressed="false">Abduction</button>
+        <button type="button" class="chip" aria-pressed="false">Abduction de hanche</button>
         <button type="button" class="chip" aria-pressed="false">Prono-supination</button>
         <button type="button" class="chip" aria-pressed="false">Inversion / éversion</button>
         <button type="button" class="chip" aria-pressed="false">Niveau intégré</button>

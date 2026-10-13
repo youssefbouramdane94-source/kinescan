@@ -76,16 +76,42 @@ KS.angles = (() => {
         return [{ label: 'Inclinaison du poignet' + sideTxt(side), value: degFr(180 - a), norm: 'Norme AAOS : radiale 0–20°, ulnaire 0–30°' }];
       },
     },
+    // Épaule (Norkin & White) : 0° = bras le long du corps, l'angle au sommet donne
+    // directement l'amplitude. Le sens (avant / arrière / côté) dépend de la vue choisie.
     epaule: {
-      label: 'Épaule — élévation (flexion / abduction)',
-      note: 'Vue de profil = flexion · vue de face = abduction. Repères : ligne du tronc (grand trochanter) → centre de la tête humérale, sous l’acromion → épicondyle latéral.',
+      label: 'Épaule — flexion',
+      note: 'Photo de profil, bras levé vers l’avant. Repères : ligne médio-axillaire du tronc (vers le grand trochanter) → tête humérale, sous l’acromion → épicondyle latéral.',
       points: [
         { id: 'p0', label: 'Grand trochanter', lm: { D: 24, G: 23 } },
         { id: 'p1', label: 'Tête humérale', lm: { D: 12, G: 11 } },
         { id: 'p2', label: 'Épicondyle lat.', lm: { D: 14, G: 13 } },
       ],
       metrics(a, side) {
-        return [{ label: 'Élévation de l’épaule' + sideTxt(side), value: degFr(a), norm: 'Norme AAOS : flexion 0–180° · abduction 0–180°' }];
+        return [{ label: 'Flexion de l’épaule' + sideTxt(side), value: degFr(a), norm: 'Norme AAOS : flexion 0–180°' }];
+      },
+    },
+    epaule_ext: {
+      label: 'Épaule — extension',
+      note: 'Photo de profil, bras tendu vers l’arrière, tronc bien droit. Repères : ligne médio-axillaire du tronc (vers le grand trochanter) → tête humérale, sous l’acromion → épicondyle latéral.',
+      points: [
+        { id: 'p0', label: 'Grand trochanter', lm: { D: 24, G: 23 } },
+        { id: 'p1', label: 'Tête humérale', lm: { D: 12, G: 11 } },
+        { id: 'p2', label: 'Épicondyle lat.', lm: { D: 14, G: 13 } },
+      ],
+      metrics(a, side) {
+        return [{ label: 'Extension de l’épaule' + sideTxt(side), value: degFr(a), norm: 'Norme AAOS : extension 0–60°' }];
+      },
+    },
+    epaule_abd: {
+      label: 'Épaule — abduction',
+      note: 'Photo de face, paume vers l’avant, tronc bien droit. Repères : ligne du tronc parallèle au sternum (vers la hanche) → face antérieure de l’acromion → milieu du coude.',
+      points: [
+        { id: 'p0', label: 'Hanche', lm: { D: 24, G: 23 } },
+        { id: 'p1', label: 'Acromion', lm: { D: 12, G: 11 } },
+        { id: 'p2', label: 'Coude', lm: { D: 14, G: 13 } },
+      ],
+      metrics(a, side) {
+        return [{ label: 'Abduction de l’épaule' + sideTxt(side), value: degFr(a), norm: 'Norme AAOS : abduction 0–180°' }];
       },
     },
     hanche: {
